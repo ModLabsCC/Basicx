@@ -10,56 +10,41 @@ commands:
   joinquit:
     join: <#C4E538>+ <#dfe6e9>%luckperms_prefix%{displayname}
     quit: <#EA2027>- <#dfe6e9>%luckperms_prefix%{displayname}
-  tp:
-    player-not-found: Player not found.
-    success: Teleported to {player}.
-    success-coordinates: Teleported to {x}, {y}, {z}.
-  tpa:
-    not-player: Only players can use this command.
-    player-not-found: Player not found.
-    self-request: You cannot send a teleport request to yourself.
-    request-sent: Teleport request sent to {target}.
-    request-received: {sender} has requested to teleport to you. Type /tpaccept to accept.
-    request-accepted: Teleport request accepted. Teleporting to {target}.
-    request-accepted-target: You have accepted {sender}'s teleport request.
-    no-request: You have no pending teleport requests.
-  invsee:
-    not-a-player: Only players can use this command.
-    player-not-found: Player not found.
-    success: You are now viewing {player}'s inventory.
-  vanish:
-    player-not-found: Player {player} not found.
-    console-usage: Console must specify a player.
-    enabled: You are now vanished.
-    disabled: You are no longer vanished.
-  gm:
-    success: Game mode changed to {mode}.
-  itemedit:
-    success: Item edited successfully.
-  trash:
-    success: Item trashed successfully.
+  economy:
+    balance: Your balance is {balance}
   feed:
     success: You have been fed.
+    sender-success: You have fed {target}.
   heal:
     success: You have been healed.
-  fly:
-    enabled: Fly mode enabled.
-    disabled: Fly mode disabled.
-  anvil:
-    success: Anvil opened.
-  warp:
-    success: Warped to {warp}.
-  createwarp:
-    success: Warp {warp} created.
-  deletewarp:
-    success: Warp {warp} deleted.
-  homes:
-    success: Home {home} set.
-  economy:
-    success: Economy command executed.
+    sender-success: You have healed {target}.
+  gm:
+    success: Game mode set to {mode}.
+  invsee:
+    success: You are now viewing {player}'s inventory.
+  itemedit:
+    signed: 'Item signed with name: Krass'
+    renamed: 'Item renamed to: Penis'
+    invalid-enchantment: 'Invalid enchantment: Poison'
   kit:
-    success: Kit {kit} received.
+    success: You have received the {kit} kit.
   time:
-    success: Time set to {time}.
+    set: Time set to 2
+    add: Time added by 2
+  tpa:
+    self-request: You cannot send a teleport request to yourself.
+  trash:
+    open: <green>Trash GUI opened. Dispose of your items here.
   weather:
-    success: Weather set to {weather}.
+    set: Weather set to {type}
+  homes:
+    set:
+      success: Home {homeName} set
+    teleport:
+      success: Teleported to home {homeName}
+    delete:
+      success: Home {homeName} deleted
+    not-found: Home {homeName} not found
+  fly:
+    success: Fly mode for {target} set to {enable}.
+
