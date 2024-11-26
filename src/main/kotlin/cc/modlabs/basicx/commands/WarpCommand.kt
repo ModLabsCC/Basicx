@@ -1,0 +1,53 @@
+package cc.modlabs.basicx.commands
+
+import cc.modlabs.basicx.BasicX
+import cc.modlabs.basicx.cache.MessageCache
+import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import com.mojang.brigadier.Command
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.tree.LiteralCommandNode
+import io.papermc.paper.command.brigadier.CommandSourceStack
+import io.papermc.paper.command.brigadier.Commands
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.entity.Player
+
+object WarpCommand {
+
+    private val warps = mutableMapOf<String, Location>()
+
+    fun createWarpCommand(): LiteralCommandNode<CommandSourceStack> {
+        return Commands.literal("warp")
+            .requires { it.sender.hasPermission("basicx.warp") }
+            .then(Commands.argument("warpName", StringArgumentType.string())
+                .executes { ctx ->
+                    val sender = ctx.source.sender
+                    val warpName = StringArgumentType.getString(ctx, "warpName")
+                    warp(sender, warpName)
+                    Command.SINGLE_SUCCESS
+                }
+            )
+            .build()
+    }
+
+    private fun warp(sender: CommandSourceStack, warpName: String) {
+        val player = sender.sender as? Player ?: return
+        val location = warps[warpName]
+
+        if (location != null) {
+            player.teleport(location)
+            player.sendMessagePrefixed("commands.warp.success", mapOf("warpName" to warpName), default = "Warped to {warpName}")
+        } else {
+            player.sendMessagePrefixed("commands.warp.not-found", mapOf("warpName" to warpName), default = "Warp {warpName} not found")
+        }
+    }
+
+    fun addWarp(warpName: String, location: Location) {
+        warps[warpName] = location
+    }
+
+    fun removeWarp(warpName: String) {
+        warps.remove(warpName)
+    }
+}
