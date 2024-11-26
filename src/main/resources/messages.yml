@@ -1,0 +1,16 @@
+
+
+general:
+  prefix: "<gradient:#4a69bd:#6a89cc>BasicX</gradient> <color:#4a628f>>></color> <color:#b2c2d4>"
+
+
+commands:
+  basicx:
+    info:
+      version: BasicX version {version}
+      reload: <yellow>Reloading config...
+      reload-success: <green>Config reloaded!
+  joinquit:
+    join: <#C4E538>+ <#dfe6e9>%luckperms_prefix%{displayname}
+    quit: <#EA2027>- <#dfe6e9>%luckperms_prefix%{displayname}
+
