@@ -7,7 +7,7 @@
 <h3 align="center">BasicX</h3>
 
   <p align="center">
-    All the basics for your minecraft paper server | Home | Warps | TPA | Vanish
+    All the basics for your minecraft paper server | Home | Warps | TPA | Vanish | TP | Invsee | GM (0 1 2 3) | Item Editing (Signing, Enchanting, Renaming) | /trash (GUI for item disposal) | /feed | /heal | /fly | /anvil | /warp (with /createwarp and /deletewarp) | /homes | Economy System | Kit System (with starter kit) | Time & Weather command
     <br />
     <br />
     <a href="https://liamxsage.com">Website</a>

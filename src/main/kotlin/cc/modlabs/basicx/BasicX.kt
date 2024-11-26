@@ -19,8 +19,6 @@ class BasicX : JavaPlugin() {
     override fun onEnable() {
         logger.info("Enabling BasicX...")
 
-
-
         // Copy the messages file to the plugins folder
         saveResource("messages.yml", false)
 
