@@ -2,6 +2,7 @@ package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.sendMessagePrefixed
 import com.mojang.brigadier.Command
+import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
@@ -16,7 +17,7 @@ class ItemEditCommand {
 
     fun register(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("itemedit")
-            .requires { it.hasPermission("basicx.itemedit") }
+            .requires { it.sender.hasPermission("basicx.itemedit") }
             .then(Commands.literal("sign")
                 .then(Commands.argument("name", StringArgumentType.string())
                     .executes { ctx -> signItem(ctx, StringArgumentType.getString(ctx, "name")) }
@@ -24,8 +25,8 @@ class ItemEditCommand {
             )
             .then(Commands.literal("enchant")
                 .then(Commands.argument("enchantment", StringArgumentType.string())
-                    .then(Commands.argument("level", StringArgumentType.integer())
-                        .executes { ctx -> enchantItem(ctx, StringArgumentType.getString(ctx, "enchantment"), StringArgumentType.getInteger(ctx, "level")) }
+                    .then(Commands.argument("level", IntegerArgumentType.integer(0))
+                        .executes { ctx -> enchantItem(ctx, StringArgumentType.getString(ctx, "enchantment"), IntegerArgumentType.getInteger(ctx, "level")) }
                     )
                 )
             )

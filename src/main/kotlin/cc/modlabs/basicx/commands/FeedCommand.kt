@@ -33,7 +33,7 @@ class FeedCommand : Command<CommandSourceStack> {
     companion object {
         fun createFeedCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("feed")
-                .requires { it.hasPermission("basicx.feed") }
+                .requires { it.sender.hasPermission("basicx.feed") }
                 .then(Commands.argument("target", StringArgumentType.string())
                     .executes(FeedCommand())
                 )

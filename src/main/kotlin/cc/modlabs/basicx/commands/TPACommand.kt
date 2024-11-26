@@ -23,19 +23,19 @@ private val tpaRequests = mutableMapOf<Player, Player>()
 private fun executeTPA(ctx: CommandContext<CommandSourceStack>): Int {
     val sender = ctx.source.sender
     if (sender !is Player) {
-        sender.sendMessage(MessageCache.getMessage("commands.tpa.not-player", sender, default = "Only players can use this command."))
+        sender.sendMessagePrefixed("commands.tpa.not-player", default = "Only players can use this command.")
         return Command.SINGLE_SUCCESS
     }
 
     val targetName = StringArgumentType.getString(ctx, "player")
     val target = Bukkit.getPlayer(targetName)
     if (target == null) {
-        sender.sendMessage(MessageCache.getMessage("commands.tpa.player-not-found", sender, default = "Player not found."))
+        sender.sendMessagePrefixed("commands.tpa.player-not-found", default = "Player not found.")
         return Command.SINGLE_SUCCESS
     }
 
     if (target == sender) {
-        sender.sendMessage(MessageCache.getMessage("commands.tpa.self-request", sender, default = "You cannot send a teleport request to yourself."))
+        sender.sendMessagePrefixed("commands.tpa.self-request", default = "You cannot send a teleport request to yourself.")
         return Command.SINGLE_SUCCESS
     }
 

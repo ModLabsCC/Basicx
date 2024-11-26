@@ -14,7 +14,7 @@ class WeatherCommand {
 
     fun createWeatherCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("weather")
-            .requires { it.hasPermission("basicx.weather") }
+            .requires { it.sender.hasPermission("basicx.weather") }
             .then(Commands.argument("type", StringArgumentType.word())
                 .suggests { _, builder ->
                     builder.suggest("clear")
@@ -33,16 +33,16 @@ class WeatherCommand {
 
         when (type) {
             "clear" -> {
-                Bukkit.getWorlds().forEach { it.setStorm(false); it.setThundering(false) }
-                sender.sendMessagePrefixed("commands.weather.set", mapOf("type" to "clear"), default = "Weather set to clear")
+                Bukkit.getWorlds().forEach { it.setStorm(false); it.isThundering = false }
+                sender.sendMessagePrefixed("commands.weather.set", mapOf("type" to "clear"), default = "Weather set to {type}")
             }
             "rain" -> {
-                Bukkit.getWorlds().forEach { it.setStorm(true); it.setThundering(false) }
-                sender.sendMessagePrefixed("commands.weather.set", mapOf("type" to "rain"), default = "Weather set to rain")
+                Bukkit.getWorlds().forEach { it.setStorm(true); it.isThundering = false }
+                sender.sendMessagePrefixed("commands.weather.set", mapOf("type" to "rain"), default = "Weather set to {type}")
             }
             "thunder" -> {
-                Bukkit.getWorlds().forEach { it.setStorm(true); it.setThundering(true) }
-                sender.sendMessagePrefixed("commands.weather.set", mapOf("type" to "thunder"), default = "Weather set to thunder")
+                Bukkit.getWorlds().forEach { it.setStorm(true); it.isThundering = true }
+                sender.sendMessagePrefixed("commands.weather.set", mapOf("type" to "thunder"), default = "Weather set to {type}")
             }
             else -> {
                 sender.sendMessagePrefixed("commands.weather.invalid", default = "Invalid weather type")

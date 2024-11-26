@@ -12,7 +12,7 @@ import org.bukkit.entity.Player
 
 fun createGMCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("gm")
-        .requires { it.hasPermission("basicx.gm") }
+        .requires { it.sender.hasPermission("basicx.gm") }
         .then(Commands.argument("mode", IntegerArgumentType.integer(0, 3))
             .executes { ctx -> setGameMode(ctx) }
         )

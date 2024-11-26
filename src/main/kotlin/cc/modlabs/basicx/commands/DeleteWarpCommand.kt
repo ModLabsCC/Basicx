@@ -9,6 +9,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 object DeleteWarpCommand {
@@ -27,8 +28,8 @@ object DeleteWarpCommand {
             .build()
     }
 
-    private fun deleteWarp(sender: CommandSourceStack, warpName: String) {
-        val player = sender.sender as? Player ?: return
+    private fun deleteWarp(sender: CommandSender, warpName: String) {
+        val player = sender as? Player ?: return
 
         WarpCommand.removeWarp(warpName)
         player.sendMessagePrefixed("commands.deletewarp.success", mapOf("warpName" to warpName), default = "Warp {warpName} deleted")

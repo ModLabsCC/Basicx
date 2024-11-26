@@ -10,6 +10,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Location
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 object CreateWarpCommand {
@@ -28,8 +29,8 @@ object CreateWarpCommand {
             .build()
     }
 
-    private fun createWarp(sender: CommandSourceStack, warpName: String) {
-        val player = sender.sender as? Player ?: return
+    private fun createWarp(sender: CommandSender, warpName: String) {
+        val player = sender as? Player ?: return
         val location = player.location
 
         WarpCommand.addWarp(warpName, location)

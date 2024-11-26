@@ -17,7 +17,7 @@ fun createTimeCommand(): LiteralCommandNode<CommandSourceStack> {
                 .executes { ctx ->
                     val time = IntegerArgumentType.getInteger(ctx, "time")
                     Bukkit.getWorlds().forEach { it.time = time.toLong() }
-                    ctx.source.sender.sendMessagePrefixed("commands.time.set", mapOf("time" to time), default = "Time set to $time")
+                    ctx.source.sender.sendMessagePrefixed("commands.time.set", mapOf("time" to time), default = "Time set to {time}")
                     return@executes Command.SINGLE_SUCCESS
                 }
             )
@@ -27,7 +27,7 @@ fun createTimeCommand(): LiteralCommandNode<CommandSourceStack> {
                 .executes { ctx ->
                     val time = IntegerArgumentType.getInteger(ctx, "time")
                     Bukkit.getWorlds().forEach { it.time += time.toLong() }
-                    ctx.source.sender.sendMessagePrefixed("commands.time.add", mapOf("time" to time), default = "Time added by $time")
+                    ctx.source.sender.sendMessagePrefixed("commands.time.add", mapOf("time" to time), default = "Time added by {time}")
                     return@executes Command.SINGLE_SUCCESS
                 }
             )

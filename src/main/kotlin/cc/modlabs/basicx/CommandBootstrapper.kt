@@ -29,7 +29,7 @@ class CommandBootstrapper : PluginBootstrap {
             )
 
             commands.register(
-                InvseeCommand().register(),
+                registerInvSeeCommand(),
                 "View another player's inventory"
             )
 
@@ -49,7 +49,7 @@ class CommandBootstrapper : PluginBootstrap {
             )
 
             commands.register(
-                TrashCommand().createCommand(),
+                createTrashCommand(),
                 "Open trash GUI"
             )
 

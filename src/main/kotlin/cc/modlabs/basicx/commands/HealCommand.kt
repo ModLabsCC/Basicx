@@ -32,7 +32,7 @@ class HealCommand : Command<CommandSourceStack> {
     companion object {
         fun createHealCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("heal")
-                .requires { it.hasPermission("basicx.heal") }
+                .requires { it.sender.hasPermission("basicx.heal") }
                 .then(Commands.argument("target", StringArgumentType.string())
                     .executes(HealCommand())
                 )

@@ -1,5 +1,6 @@
 package cc.modlabs.basicx.commands
 
+import cc.modlabs.basicx.BasicX
 import cc.modlabs.basicx.extensions.sendMessagePrefixed
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.BoolArgumentType
@@ -10,17 +11,18 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.metadata.FixedMetadataValue
 
 class VanishCommand {
 
     fun createVanishCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("vanish")
-            .requires { it.hasPermission("basicx.vanish") }
+            .requires { it.sender.hasPermission("basicx.vanish") }
             .then(Commands.argument("state", BoolArgumentType.bool())
                 .executes { ctx -> executeVanish(ctx, BoolArgumentType.getBool(ctx, "state")) }
             )
             .then(Commands.argument("player", StringArgumentType.string())
-                .requires { it.hasPermission("basicx.vanish.others") }
+                .requires { it.sender.hasPermission("basicx.vanish.others") }
                 .then(Commands.argument("state", BoolArgumentType.bool())
                     .executes { ctx -> executeVanish(ctx, BoolArgumentType.getBool(ctx, "state"), StringArgumentType.getString(ctx, "player")) }
                 )

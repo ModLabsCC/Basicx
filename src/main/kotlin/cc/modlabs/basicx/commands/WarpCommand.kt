@@ -11,6 +11,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 object WarpCommand {
@@ -31,8 +32,8 @@ object WarpCommand {
             .build()
     }
 
-    private fun warp(sender: CommandSourceStack, warpName: String) {
-        val player = sender.sender as? Player ?: return
+    private fun warp(sender: CommandSender, warpName: String) {
+        val player = sender as? Player ?: return
         val location = warps[warpName]
 
         if (location != null) {

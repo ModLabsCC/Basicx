@@ -14,7 +14,7 @@ import org.bukkit.entity.Player
 
 fun createEconomyCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("economy")
-        .requires { it.hasPermission("basicx.economy") }
+        .requires { it.sender.hasPermission("basicx.economy") }
         .then(Commands.literal("balance")
             .executes { ctx ->
                 val sender = ctx.source.sender

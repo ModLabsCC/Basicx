@@ -10,6 +10,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Location
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 object HomesCommand {
@@ -52,23 +53,23 @@ object HomesCommand {
             .build()
     }
 
-    private fun setHome(sender: CommandSourceStack, homeName: String) {
-        val player = sender.sender as? Player ?: return
+    private fun setHome(sender: CommandSender, homeName: String) {
+        val player = sender as? Player ?: return
         val location = player.location
 
         homes[homeName] = location
         player.sendMessagePrefixed("commands.homes.set.success", mapOf("homeName" to homeName), default = "Home {homeName} set")
     }
 
-    private fun deleteHome(sender: CommandSourceStack, homeName: String) {
-        val player = sender.sender as? Player ?: return
+    private fun deleteHome(sender: CommandSender, homeName: String) {
+        val player = sender as? Player ?: return
 
         homes.remove(homeName)
         player.sendMessagePrefixed("commands.homes.delete.success", mapOf("homeName" to homeName), default = "Home {homeName} deleted")
     }
 
-    private fun teleportHome(sender: CommandSourceStack, homeName: String) {
-        val player = sender.sender as? Player ?: return
+    private fun teleportHome(sender: CommandSender, homeName: String) {
+        val player = sender as? Player ?: return
         val location = homes[homeName]
 
         if (location != null) {
