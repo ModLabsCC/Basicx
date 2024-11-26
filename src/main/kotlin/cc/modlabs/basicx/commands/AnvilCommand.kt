@@ -8,6 +8,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -22,7 +23,7 @@ class AnvilCommand : Command<CommandSourceStack> {
         }
 
         val player = sender as Player
-        val inventory: Inventory = Bukkit.createInventory(player, 9, "Anvil")
+        val inventory: Inventory = Bukkit.createInventory(player, InventoryType.ANVIL, "Anvil")
 
         player.openInventory(inventory)
         return Command.SINGLE_SUCCESS
