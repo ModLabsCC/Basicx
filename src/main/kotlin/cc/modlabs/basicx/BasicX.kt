@@ -3,6 +3,7 @@ package cc.modlabs.basicx
 import cc.modlabs.basicx.cache.MessageCache
 import cc.modlabs.basicx.cache.WarpCache
 import cc.modlabs.basicx.cache.HomeCache
+import cc.modlabs.basicx.cache.KitCache
 import cc.modlabs.basicx.managers.RegisterManager
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.system.measureTimeMillis
@@ -23,12 +24,14 @@ class BasicX : JavaPlugin() {
 
         // Copy the messages file to the plugins folder
         saveResource("messages.yml", false)
+        saveResource("kits.yml", false)
 
         // Plugin startup logic
         val time = measureTimeMillis {
             MessageCache.loadCache()
             WarpCache.loadCache()
             HomeCache.loadCache()
+            KitCache.loadCache()
         }
 
         RegisterManager.registerListeners(this)

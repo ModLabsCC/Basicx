@@ -8,6 +8,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 
 class FeedCommand : Command<CommandSourceStack> {
 
@@ -33,6 +34,18 @@ class FeedCommand : Command<CommandSourceStack> {
         fun createFeedCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("feed")
                 .requires { it.sender.hasPermission("basicx.feed") }
+                .executes { context ->
+                    val sender = context.source.sender
+                    if (sender !is Player) {
+                        sender.send("commands.feed.not-player", default = "Only players can use this command.")
+                        return@executes Command.SINGLE_SUCCESS
+                    }
+
+                    sender.foodLevel = 20
+                    sender.saturation = 20.0f
+                    sender.send("commands.feed.success", default = "You have been fed.")
+                    Command.SINGLE_SUCCESS
+                }
                 .then(Commands.argument("target", StringArgumentType.string())
                     .executes(FeedCommand())
                 )
