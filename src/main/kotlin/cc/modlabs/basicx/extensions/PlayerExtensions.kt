@@ -1,19 +1,18 @@
 package cc.modlabs.basicx.extensions
 
-import cc.modlabs.basicx.PREFIX
 import cc.modlabs.basicx.cache.MessageCache
 import dev.fruxz.stacked.text
 import org.bukkit.*
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-fun Player.sendMessagePrefixed(key: String, placeholders: Map<String, Any> = emptyMap<String, String>(), default: String = key) {
-    this.sendMessage(text(PREFIX + MessageCache.getMessage(key, this, placeholders, default)))
+fun Player.send(key: String, placeholders: Map<String, Any> = emptyMap<String, String>(), default: String = key) {
+    this.sendMessage(text(MessageCache.getMessage(key, this, placeholders, default)))
 }
 
-fun CommandSender.sendMessagePrefixed(key: String, placeholders: Map<String, Any> = emptyMap<String, String>(), default: String = key) = sendMessage(text(PREFIX + MessageCache.getMessage(key, this, placeholders, default)))
+fun CommandSender.send(key: String, placeholders: Map<String, Any> = emptyMap<String, String>(), default: String = key) = sendMessage(text(MessageCache.getMessage(key, this, placeholders, default)))
 
-fun broadcastPrefixed(key: String, placeholders: Map<String, Any> = emptyMap<String, String>(), default: String = key) = Bukkit.broadcast(text(PREFIX + MessageCache.getMessage(key, Bukkit.getConsoleSender(), placeholders, default)))
+fun broadcast(key: String, placeholders: Map<String, Any> = emptyMap<String, String>(), default: String =key) = Bukkit.broadcast(text(MessageCache.getMessage(key, Bukkit.getConsoleSender(), placeholders, default)))
 
 fun CommandSender.sendEmtpyLine() = sendMessage(text(" "))
 

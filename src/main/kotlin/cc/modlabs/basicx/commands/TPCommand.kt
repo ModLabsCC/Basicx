@@ -1,7 +1,6 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
-import cc.modlabs.basicx.extensions.sendSuccessSound
+import cc.modlabs.basicx.extensions.send
 import cc.modlabs.basicx.extensions.sendTeleportSound
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.DoubleArgumentType
@@ -35,12 +34,12 @@ private fun executeTPPlayer(ctx: CommandContext<CommandSourceStack>): Int {
     val targetName = StringArgumentType.getString(ctx, "player")
     val target = Bukkit.getPlayer(targetName)
     if (target == null) {
-        sender.sendMessagePrefixed("commands.tp.player-not-found", default = "Player not found.")
+        sender.send("commands.tp.player-not-found", default = "Player not found.")
         return Command.SINGLE_SUCCESS
     }
 
     sender.teleport(target.location)
-    sender.sendMessagePrefixed("commands.tp.success", mapOf("player" to target.name), default = "Teleported to {player}.")
+    sender.send("commands.tp.success", mapOf("player" to target.name), default = "Teleported to {player}.")
     sender.sendTeleportSound()
     return Command.SINGLE_SUCCESS
 }
@@ -58,7 +57,7 @@ private fun executeTPCoordinates(ctx: CommandContext<CommandSourceStack>): Int {
 
     val location = Location(sender.world, x, y, z)
     sender.teleport(location)
-    sender.sendMessagePrefixed("commands.tp.success-coordinates", mapOf("x" to x, "y" to y, "z" to z), default = "Teleported to {x}, {y}, {z}.")
+    sender.send("commands.tp.success-coordinates", mapOf("x" to x, "y" to y, "z" to z), default = "Teleported to {x}, {y}, {z}.")
     sender.sendTeleportSound()
     return Command.SINGLE_SUCCESS
 }

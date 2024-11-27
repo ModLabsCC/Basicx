@@ -1,6 +1,6 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -8,7 +8,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
+import org.bukkit.attribute.Attribute
 
 class HealCommand : Command<CommandSourceStack> {
 
@@ -18,13 +18,13 @@ class HealCommand : Command<CommandSourceStack> {
         val target = Bukkit.getPlayer(targetName)
 
         if (target == null) {
-            sender.sendMessagePrefixed("commands.heal.target-not-found", mapOf("target" to targetName), default = "Player {target} not found.")
+            sender.send("commands.heal.target-not-found", mapOf("target" to targetName), default = "Player {target} not found.")
             return Command.SINGLE_SUCCESS
         }
 
-        target.health = target.maxHealth
-        target.sendMessagePrefixed("commands.heal.success", default = "You have been healed.")
-        sender.sendMessagePrefixed("commands.heal.sender-success", mapOf("target" to targetName), default = "You have healed {target}.")
+        target.health = target.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
+        target.send("commands.heal.success", default = "You have been healed.")
+        sender.send("commands.heal.sender-success", mapOf("target" to targetName), default = "You have healed {target}.")
 
         return Command.SINGLE_SUCCESS
     }

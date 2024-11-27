@@ -1,8 +1,6 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.BasicX
-import cc.modlabs.basicx.cache.MessageCache
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
@@ -20,9 +18,9 @@ fun createEconomyCommand(): LiteralCommandNode<CommandSourceStack> {
                 val sender = ctx.source.sender
                 if (sender is Player) {
                     val balance = getBalance(sender)
-                    sender.sendMessagePrefixed("commands.economy.balance", mapOf("balance" to balance), default = "Your balance is {balance}")
+                    sender.send("commands.economy.balance", mapOf("balance" to balance), default = "Your balance is {balance}")
                 } else {
-                    sender.sendMessagePrefixed("commands.economy.error", default = "This command can only be used by players.")
+                    sender.send("commands.economy.error", default = "This command can only be used by players.")
                 }
                 return@executes Command.SINGLE_SUCCESS
             }
@@ -38,16 +36,16 @@ fun createEconomyCommand(): LiteralCommandNode<CommandSourceStack> {
                             val target = Bukkit.getPlayer(targetName)
                             if (target != null && target.isOnline) {
                                 if (pay(sender, target, amount)) {
-                                    sender.sendMessagePrefixed("commands.economy.pay.success", mapOf("amount" to amount, "player" to target.name), default = "You paid {amount} to {player}")
-                                    target.sendMessagePrefixed("commands.economy.pay.received", mapOf("amount" to amount, "player" to sender.name), default = "You received {amount} from {player}")
+                                    sender.send("commands.economy.pay.success", mapOf("amount" to amount, "player" to target.name), default = "You paid {amount} to {player}")
+                                    target.send("commands.economy.pay.received", mapOf("amount" to amount, "player" to sender.name), default = "You received {amount} from {player}")
                                 } else {
-                                    sender.sendMessagePrefixed("commands.economy.pay.error", default = "You do not have enough balance.")
+                                    sender.send("commands.economy.pay.error", default = "You do not have enough balance.")
                                 }
                             } else {
-                                sender.sendMessagePrefixed("commands.economy.pay.error", default = "Player not found or not online.")
+                                sender.send("commands.economy.pay.error", default = "Player not found or not online.")
                             }
                         } else {
-                            sender.sendMessagePrefixed("commands.economy.error", default = "This command can only be used by players.")
+                            sender.send("commands.economy.error", default = "This command can only be used by players.")
                         }
                         return@executes Command.SINGLE_SUCCESS
                     }

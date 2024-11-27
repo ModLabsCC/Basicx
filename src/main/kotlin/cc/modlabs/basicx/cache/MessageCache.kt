@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 object MessageCache {
 
     private val cacheLock: ReadWriteLock = ReentrantReadWriteLock()
-    private var cache: Map<String, String> = kotlin.collections.mapOf()
+    private var cache: Map<String, String> = mapOf()
 
     fun getMessage(key: String, commandSender: CommandSender = Bukkit.getConsoleSender(), placeholders: Map<String, Any> = emptyMap<String, String>(), default: String = key): String {
         cacheLock.readLock().lock()
@@ -42,7 +42,7 @@ object MessageCache {
             return messagesFile.getString(key) ?: default
         }
 
-        messagesFile[key] = default
+        messagesFile[key] = "\${{variables.prefix}}$default"
         messagesFile.saveConfig()
 
         cacheLock.writeLock().lock()
@@ -64,8 +64,23 @@ object MessageCache {
             tempCache[it] = message
         }
 
-        cache = tempCache
+        cache = parsePlaceholders(tempCache)
         cacheLock.writeLock().unlock()
+    }
+
+    private fun parsePlaceholders(tempCache: MutableMap<String, String>): Map<String, String> {
+        val regex = Regex("\\$\\{\\{([a-zA-Z0-9_.]+)\\}\\}")
+        val resolvedCache = mutableMapOf<String, String>()
+
+        tempCache.forEach { (key, value) ->
+            val newValue = regex.replace(value) { matchResult ->
+                val variable = matchResult.groupValues[1]
+                tempCache[variable] ?: matchResult.value // Fallback to the original if not found
+            }
+            resolvedCache[key] = newValue
+        }
+
+        return resolvedCache
     }
 
     // Add placeholders with start and end %

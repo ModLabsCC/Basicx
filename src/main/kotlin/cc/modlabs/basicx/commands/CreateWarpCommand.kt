@@ -1,15 +1,11 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.BasicX
-import cc.modlabs.basicx.cache.MessageCache
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -34,6 +30,6 @@ object CreateWarpCommand {
         val location = player.location
 
         WarpCommand.addWarp(warpName, location)
-        player.sendMessagePrefixed("commands.createwarp.success", mapOf("warpName" to warpName), default = "Warp {warpName} created")
+        player.send("commands.createwarp.success", mapOf("warpName" to warpName), default = "Warp {warpName} created")
     }
 }

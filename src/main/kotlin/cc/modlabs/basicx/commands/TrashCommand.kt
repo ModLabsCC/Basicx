@@ -1,6 +1,6 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
@@ -23,7 +23,7 @@ private fun openTrashGUI(ctx: CommandContext<CommandSourceStack>): Int {
     val trashInventory = Bukkit.createInventory(null, 27, text("Trash"))
 
     player.openInventory(trashInventory)
-    player.sendMessagePrefixed("commands.trash.open", default = "<green>Trash GUI opened. Dispose of your items here.")
+    player.send("commands.trash.open", default = "<green>Trash GUI opened. Dispose of your items here.")
 
     return Command.SINGLE_SUCCESS
 }

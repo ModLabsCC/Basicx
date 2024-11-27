@@ -1,6 +1,6 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -22,18 +22,18 @@ fun registerInvSeeCommand(): LiteralCommandNode<CommandSourceStack?>? {
 private fun execute(ctx: CommandContext<CommandSourceStack>): Int {
     val sender = ctx.source.sender
     if (sender !is Player) {
-        sender.sendMessagePrefixed("commands.invsee.not-a-player", default = "Only players can use this command.")
+        sender.send("commands.invsee.not-a-player", default = "Only players can use this command.")
         return Command.SINGLE_SUCCESS
     }
 
     val targetName = StringArgumentType.getString(ctx, "player")
     val target = Bukkit.getPlayer(targetName)
     if (target == null) {
-        sender.sendMessagePrefixed("commands.invsee.player-not-found", default = "Player not found.")
+        sender.send("commands.invsee.player-not-found", default = "Player not found.")
         return Command.SINGLE_SUCCESS
     }
 
     sender.openInventory(target.inventory)
-    sender.sendMessagePrefixed("commands.invsee.success", mapOf("player" to target.name), default = "You are now viewing {player}'s inventory.")
+    sender.send("commands.invsee.success", mapOf("player" to target.name), default = "You are now viewing {player}'s inventory.")
     return Command.SINGLE_SUCCESS
 }

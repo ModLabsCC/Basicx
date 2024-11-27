@@ -1,6 +1,6 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
@@ -11,7 +11,6 @@ import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
-import org.bukkit.inventory.meta.ItemMeta
 
 class ItemEditCommand {
 
@@ -42,7 +41,7 @@ class ItemEditCommand {
         val item = player.inventory.itemInMainHand
 
         if (item.type == Material.AIR) {
-            player.sendMessagePrefixed("commands.itemedit.no-item", default = "You must hold an item to sign it.")
+            player.send("commands.itemedit.no-item", default = "You must hold an item to sign it.")
             return Command.SINGLE_SUCCESS
         }
 
@@ -50,7 +49,7 @@ class ItemEditCommand {
         meta?.setDisplayName(name)
         item.itemMeta = meta
 
-        player.sendMessagePrefixed("commands.itemedit.signed", mapOf("name" to name), default = "Item signed with name: $name")
+        player.send("commands.itemedit.signed", mapOf("name" to name), default = "Item signed with name: $name")
         return Command.SINGLE_SUCCESS
     }
 
@@ -59,18 +58,18 @@ class ItemEditCommand {
         val item = player.inventory.itemInMainHand
 
         if (item.type == Material.AIR) {
-            player.sendMessagePrefixed("commands.itemedit.no-item", default = "You must hold an item to enchant it.")
+            player.send("commands.itemedit.no-item", default = "You must hold an item to enchant it.")
             return Command.SINGLE_SUCCESS
         }
 
         val enchant = Enchantment.getByName(enchantment.toUpperCase())
         if (enchant == null) {
-            player.sendMessagePrefixed("commands.itemedit.invalid-enchantment", mapOf("enchantment" to enchantment), default = "Invalid enchantment: $enchantment")
+            player.send("commands.itemedit.invalid-enchantment", mapOf("enchantment" to enchantment), default = "Invalid enchantment: $enchantment")
             return Command.SINGLE_SUCCESS
         }
 
         item.addUnsafeEnchantment(enchant, level)
-        player.sendMessagePrefixed("commands.itemedit.enchanted", mapOf("enchantment" to enchantment, "level" to level), default = "Item enchanted with $enchantment level $level")
+        player.send("commands.itemedit.enchanted", mapOf("enchantment" to enchantment, "level" to level), default = "Item enchanted with $enchantment level $level")
         return Command.SINGLE_SUCCESS
     }
 
@@ -79,7 +78,7 @@ class ItemEditCommand {
         val item = player.inventory.itemInMainHand
 
         if (item.type == Material.AIR) {
-            player.sendMessagePrefixed("commands.itemedit.no-item", default = "You must hold an item to rename it.")
+            player.send("commands.itemedit.no-item", default = "You must hold an item to rename it.")
             return Command.SINGLE_SUCCESS
         }
 
@@ -87,7 +86,7 @@ class ItemEditCommand {
         meta?.setDisplayName(name)
         item.itemMeta = meta
 
-        player.sendMessagePrefixed("commands.itemedit.renamed", mapOf("name" to name), default = "Item renamed to: $name")
+        player.send("commands.itemedit.renamed", mapOf("name" to name), default = "Item renamed to: $name")
         return Command.SINGLE_SUCCESS
     }
 }

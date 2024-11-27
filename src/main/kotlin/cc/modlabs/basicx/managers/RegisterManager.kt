@@ -27,7 +27,7 @@ object RegisterManager {
                             classes.add(loadedClass as KClass<out T>)
                         }
                     } catch (_: Exception) {
-                        // Ignore
+                        // Ignore, as this is not a class we need to load
                     }
                 }
             }
@@ -50,9 +50,13 @@ object RegisterManager {
 
         var amountListeners = 0
         listenerClasses.forEach {
-            val listener = it.primaryConstructor?.call() as Listener
-            Bukkit.getPluginManager().registerEvents(listener, plugin)
-            amountListeners++
+            try {
+                val listener = it.primaryConstructor?.call() as Listener
+                Bukkit.getPluginManager().registerEvents(listener, plugin)
+                amountListeners++
+            } catch (e: Exception) {
+                logger.error("Failed to register listener: ${it.simpleName}", e)
+            }
         }
         logger.info("Registered $amountListeners listeners")
     }
