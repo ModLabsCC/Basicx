@@ -5,12 +5,14 @@ import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
 class KitCommand : Command<CommandSourceStack> {
 
@@ -56,8 +58,27 @@ class KitCommand : Command<CommandSourceStack> {
     companion object {
         fun createKitCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("kit")
+                .executes { context ->
+                    val sender = context.source.sender
+
+                    // list all kits
+                    val kits = KitCache.getKits()
+                    if (kits.isEmpty()) {
+                        sender.send("commands.kit.list-empty", default = "There are no kits available.")
+                        return@executes Command.SINGLE_SUCCESS
+                    }
+
+                    sender.send("commands.kit.list", default = "Available kits are:")
+                    for (kit in kits) {
+                        sender.send("commands.kit.list-entry", mapOf("kit" to kit), default = "» <yellow><click:run_command:'/kit {kit}'><hover:show_text:'Click to receive the {kit} kit'>{kit}</hover></click></yellow>")
+                    }
+
+
+                    Command.SINGLE_SUCCESS
+                }
                 .then(Commands.argument("kit", StringArgumentType.string())
                     .executes(KitCommand())
+                    .suggests(::buildKitSuggest)
                 )
                 .then(Commands.literal("preview")
                     .then(Commands.argument("kit", StringArgumentType.string())
@@ -82,9 +103,26 @@ class KitCommand : Command<CommandSourceStack> {
 
                             Command.SINGLE_SUCCESS
                         }
+                        .suggests(::buildKitSuggest)
                     )
                 )
+                .then(Commands.literal("reload")
+                    .requires { it.sender.hasPermission("basicx.kits.reload") }
+                    .executes { context ->
+                        val sender = context.source.sender
+                        KitCache.loadCache()
+                        sender.send("commands.kit.reload-success", default = "Kits reloaded.")
+                        Command.SINGLE_SUCCESS
+                    }
+                )
                 .build()
+        }
+
+        private fun buildKitSuggest(ctx: CommandContext<CommandSourceStack>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+            KitCache.getKits().forEach { kitName ->
+                builder.suggest(kitName)
+            }
+            return builder.buildFuture()
         }
     }
 }

@@ -1,4 +1,4 @@
-package cc.modlabs.basicx.listeners
+package cc.modlabs.basicx.modules.`join-quit`
 
 import cc.modlabs.basicx.cache.MessageCache
 import dev.fruxz.stacked.text

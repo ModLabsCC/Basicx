@@ -1,7 +1,7 @@
 package cc.modlabs.basicx.cache
 
+import cc.modlabs.basicx.extensions.getLogger
 import cc.modlabs.basicx.utils.FileConfig
-import org.bukkit.Bukkit
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
@@ -18,6 +18,13 @@ object KitCache {
         val kit = cache[name]
         cacheLock.readLock().unlock()
         return kit
+    }
+
+    fun getKits(): List<String> {
+        cacheLock.readLock().lock()
+        val kits = cache.keys.toList()
+        cacheLock.readLock().unlock()
+        return kits
     }
 
     fun addKit(name: String, items: List<ItemStack>) {
@@ -39,17 +46,24 @@ object KitCache {
         cache = mutableMapOf()
 
         val kitsFile = FileConfig("kits.yml")
-        kitsFile.getKeys(false).forEach { kitName ->
+        val kitNames = kitsFile.getKeys(false)
+
+        for (kitName in kitNames) {
             val items = mutableListOf<ItemStack>()
-            kitsFile.getConfigurationSection(kitName)?.getKeys(false)?.forEach { itemKey ->
-                val itemStack = kitsFile.getItemStack("$kitName.$itemKey")
-                if (itemStack != null) {
-                    items.add(itemStack)
+
+            val itemPaths = kitsFile.getConfigurationSection(kitName)?.getKeys(false) ?: continue
+
+            for (itemPath in itemPaths) {
+                val item = kitsFile.getItemStack("$kitName.$itemPath")
+                if (item != null) {
+                    items.add(item)
                 }
             }
+
             cache[kitName] = items
         }
 
+        getLogger().info("Loaded ${cache.size} kits")
         cacheLock.writeLock().unlock()
     }
 
