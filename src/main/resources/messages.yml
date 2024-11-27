@@ -1,50 +1,58 @@
-general:
-  prefix: "<gradient:#4a69bd:#6a89cc>BasicX</gradient> <color:#4a628f>>></color> <color:#b2c2d4>"
+
+### Variables are a way to reuse objects in your messages
+## You can define you own variables if you like.
+## Use them by including ${{variables.your-variable}} anywhere in this file
+variables:
+  prefix: <gradient:#4a69bd:#6a89cc>BasicX</gradient> <color:#4a628f>>></color> <color:#b2c2d4>
 
 commands:
   basicx:
     info:
-      version: BasicX version {version}
-      reload: <yellow>Reloading config...
-      reload-success: <green>Config reloaded!
+      version: ${{variables.prefix}} BasicX version {version}
+      reload: ${{variables.prefix}} <yellow>Reloading config...
+      reload-success: ${{variables.prefix}} <green>Config reloaded!
   joinquit:
     join: <#C4E538>+ <#dfe6e9>%luckperms_prefix%{displayname}
     quit: <#EA2027>- <#dfe6e9>%luckperms_prefix%{displayname}
   economy:
-    balance: Your balance is {balance}
+    balance: ${{variables.prefix}} Your balance is {balance}
   feed:
-    success: You have been fed.
-    sender-success: You have fed {target}.
+    success: ${{variables.prefix}} You have been fed.
+    sender-success: ${{variables.prefix}} You have fed {target}.
   heal:
-    success: You have been healed.
-    sender-success: You have healed {target}.
+    success: ${{variables.prefix}} You have been healed.
+    sender-success: ${{variables.prefix}} You have healed {target}.
   gm:
-    success: Game mode set to {mode}.
+    success: ${{variables.prefix}} Game mode set to {mode}.
   invsee:
-    success: You are now viewing {player}'s inventory.
+    success: ${{variables.prefix}} You are now viewing {player}'s inventory.
   itemedit:
-    signed: 'Item signed with name: Krass'
-    renamed: 'Item renamed to: Penis'
-    invalid-enchantment: 'Invalid enchantment: Poison'
+    invalid-enchantment: '${{variables.prefix}} Invalid enchantment: Poison'
   kit:
-    success: You have received the {kit} kit.
-  time:
-    set: Time set to 2
-    add: Time added by 2
+    success: ${{variables.prefix}} You have received the {kit} kit.
   tpa:
-    self-request: You cannot send a teleport request to yourself.
+    self-request: ${{variables.prefix}} You cannot send a teleport request to yourself.
   trash:
-    open: <green>Trash GUI opened. Dispose of your items here.
+    open: ${{variables.prefix}} <green>Trash GUI opened. Dispose of your items here.
   weather:
-    set: Weather set to {type}
+    set: ${{variables.prefix}} Weather set to {type}
   homes:
     set:
-      success: Home {homeName} set
+      success: ${{variables.prefix}} Home {homeName} set
     teleport:
-      success: Teleported to home {homeName}
+      success: ${{variables.prefix}} Teleported to home {homeName}
     delete:
-      success: Home {homeName} deleted
-    not-found: Home {homeName} not found
+      success: ${{variables.prefix}} Home {homeName} deleted
+    not-found: ${{variables.prefix}} Home {homeName} not found
+    list: '${{variables.prefix}} Your homes are:'
+    list-entry: » <yellow><click:run_command:'/home {home}'>{home}</click></yellow>
   fly:
-    success: Fly mode for {target} set to {enable}.
-
+    success: ${{variables.prefix}} Fly mode for {target} set to {enable}.
+  warp:
+    list-empty: ${{variables.prefix}} There are no warps set.
+    list: '${{variables.prefix}} There are <yellow>{warps}</yellow> warps:'
+    list-entry: » <yellow><click:run_command:'/warp {warp}'><hover:show_text:'Click
+      to warp to {warp}'>{warp}</hover></click></yellow>
+    success: ${{variables.prefix}} Warped to {warpName}
+  createwarp:
+    success: ${{variables.prefix}} Warp {warpName} created

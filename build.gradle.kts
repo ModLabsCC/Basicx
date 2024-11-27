@@ -96,10 +96,12 @@ tasks {
             include(".dependencies")
         }
 
-        expand(
-            "version" to project.version,
-            "name" to project.name,
-        )
+        filesMatching("paper-plugin.yml") {
+            expand(
+                "version" to project.version,
+                "name" to project.name,
+            )
+        }
     }
 
     register<JavaCompile>("compileMain") {

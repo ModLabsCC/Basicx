@@ -12,12 +12,26 @@ object HomeCache {
     private val cacheLock: ReadWriteLock = ReentrantReadWriteLock()
     private var cache: MutableMap<UUID, MutableMap<String, Location>> = mutableMapOf()
 
+    val homeAmount: Int
+        get() = cache.values.sumOf { it.size }
+
+    val homedPlayers: Int
+        get() = cache.size
+
     fun getHome(playerUUID: UUID, homeName: String): Location? {
         cacheLock.readLock().lock()
         val playerHomes = cache[playerUUID]
         val location = playerHomes?.get(homeName)
         cacheLock.readLock().unlock()
         return location
+    }
+
+    fun getHomes(playerUUID: UUID): List<String> {
+        cacheLock.readLock().lock()
+        val playerHomes = cache[playerUUID]
+        val homes = playerHomes?.keys?.toList() ?: emptyList()
+        cacheLock.readLock().unlock()
+        return homes
     }
 
     fun addHome(playerUUID: UUID, homeName: String, location: Location) {
@@ -68,12 +82,12 @@ object HomeCache {
 
         cache.forEach { (playerKey, playerHomes) ->
             playerHomes.forEach { (homeKey, location) ->
-                homesFile.set("$playerKey.$homeKey.world", location.world?.name)
-                homesFile.set("$playerKey.$homeKey.x", location.x)
-                homesFile.set("$playerKey.$homeKey.y", location.y)
-                homesFile.set("$playerKey.$homeKey.z", location.z)
-                homesFile.set("$playerKey.$homeKey.yaw", location.yaw)
-                homesFile.set("$playerKey.$homeKey.pitch", location.pitch)
+                homesFile["$playerKey.$homeKey.world"] = location.world?.name
+                homesFile["$playerKey.$homeKey.x"] = location.x
+                homesFile["$playerKey.$homeKey.y"] = location.y
+                homesFile["$playerKey.$homeKey.z"] = location.z
+                homesFile["$playerKey.$homeKey.yaw"] = location.yaw
+                homesFile["$playerKey.$homeKey.pitch"] = location.pitch
             }
         }
 

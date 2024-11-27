@@ -11,11 +11,21 @@ object WarpCache {
     private val cacheLock: ReadWriteLock = ReentrantReadWriteLock()
     private var cache: MutableMap<String, Location> = mutableMapOf()
 
+    val warpAmount: Int
+        get() = cache.size
+
     fun getWarp(name: String): Location? {
         cacheLock.readLock().lock()
         val location = cache[name]
         cacheLock.readLock().unlock()
         return location
+    }
+
+    fun getWarps():List<String> {
+        cacheLock.readLock().lock()
+        val warps = cache.keys.toList()
+        cacheLock.readLock().unlock()
+        return warps
     }
 
     fun addWarp(name: String, location: Location) {
@@ -55,12 +65,12 @@ object WarpCache {
         val warpsFile = FileConfig("warps.yml")
 
         cache.forEach { (key, location) ->
-            warpsFile.set("$key.world", location.world?.name)
-            warpsFile.set("$key.x", location.x)
-            warpsFile.set("$key.y", location.y)
-            warpsFile.set("$key.z", location.z)
-            warpsFile.set("$key.yaw", location.yaw)
-            warpsFile.set("$key.pitch", location.pitch)
+            warpsFile["$key.world"] = location.world?.name
+            warpsFile["$key.x"] = location.x
+            warpsFile["$key.y"] = location.y
+            warpsFile["$key.z"] = location.z
+            warpsFile["$key.yaw"] = location.yaw
+            warpsFile["$key.pitch"] = location.pitch
         }
 
         warpsFile.saveConfig()

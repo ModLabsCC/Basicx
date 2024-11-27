@@ -23,8 +23,6 @@ class BasicX : JavaPlugin() {
 
         // Copy the messages file to the plugins folder
         saveResource("messages.yml", false)
-        saveResource("warps.yml", false)
-        saveResource("homes.yml", false)
 
         // Plugin startup logic
         val time = measureTimeMillis {

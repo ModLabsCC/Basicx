@@ -1,7 +1,7 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.BasicX
-import cc.modlabs.basicx.extensions.sendMessagePrefixed
+import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
@@ -35,12 +35,12 @@ class VanishCommand {
         val sender = ctx.source.sender
         val targetPlayer: Player = if (targetPlayerName != null) {
             Bukkit.getPlayer(targetPlayerName) ?: run {
-                sender.sendMessagePrefixed("commands.vanish.player-not-found", mapOf("player" to targetPlayerName), default = "Player {player} not found.")
+                sender.send("commands.vanish.player-not-found", mapOf("player" to targetPlayerName), default = "Player {player} not found.")
                 return Command.SINGLE_SUCCESS
             }
         } else {
             if (sender is Player) sender else {
-                sender.sendMessagePrefixed("commands.vanish.console-usage", default = "Console must specify a player.")
+                sender.send("commands.vanish.console-usage", default = "Console must specify a player.")
                 return Command.SINGLE_SUCCESS
             }
         }
@@ -49,11 +49,11 @@ class VanishCommand {
         if (vanishState) {
             targetPlayer.setMetadata("vanished", FixedMetadataValue(BasicX.instance, true))
             Bukkit.getOnlinePlayers().forEach { it.hidePlayer(BasicX.instance, targetPlayer) }
-            targetPlayer.sendMessagePrefixed("commands.vanish.enabled", default = "You are now vanished.")
+            targetPlayer.send("commands.vanish.enabled", default = "You are now vanished.")
         } else {
             targetPlayer.removeMetadata("vanished", BasicX.instance)
             Bukkit.getOnlinePlayers().forEach { it.showPlayer(BasicX.instance, targetPlayer) }
-            targetPlayer.sendMessagePrefixed("commands.vanish.disabled", default = "You are no longer vanished.")
+            targetPlayer.send("commands.vanish.disabled", default = "You are no longer vanished.")
         }
 
         return Command.SINGLE_SUCCESS

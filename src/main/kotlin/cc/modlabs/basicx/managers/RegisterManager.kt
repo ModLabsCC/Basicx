@@ -26,8 +26,8 @@ object RegisterManager {
                         if (clazzType.isInstance(loadedClass.javaObjectType.getDeclaredConstructor().newInstance())) {
                             classes.add(loadedClass as KClass<out T>)
                         }
-                    } catch (e: Exception) {
-                        logger.error("Failed to load class: ${classInfo.name}", e)
+                    } catch (_: Exception) {
+                        // Ignore, as this is not a class we need to load
                     }
                 }
             }

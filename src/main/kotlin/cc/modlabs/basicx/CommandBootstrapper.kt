@@ -1,6 +1,7 @@
 package cc.modlabs.basicx
 
 import cc.modlabs.basicx.commands.*
+import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
@@ -27,14 +28,14 @@ class CommandBootstrapper : PluginBootstrap {
         }
     }
 
-    private fun registerPluginManagementCommands(commands: CommandRegistrar) {
+    private fun registerPluginManagementCommands(commands: Commands) {
         commands.register(
             createBasicXCommand(),
             "Plugin management"
         )
     }
 
-    private fun registerTeleportationCommands(commands: CommandRegistrar) {
+    private fun registerTeleportationCommands(commands: Commands) {
         commands.register(
             createTPCommand(),
             "Teleport to a player or coordinates"
@@ -46,21 +47,21 @@ class CommandBootstrapper : PluginBootstrap {
         )
     }
 
-    private fun registerInventoryCommands(commands: CommandRegistrar) {
+    private fun registerInventoryCommands(commands: Commands) {
         commands.register(
             registerInvSeeCommand(),
             "View another player's inventory"
         )
     }
 
-    private fun registerGameModeCommands(commands: CommandRegistrar) {
+    private fun registerGameModeCommands(commands: Commands) {
         commands.register(
             createGMCommand(),
             "Change game mode"
         )
     }
 
-    private fun registerUtilityCommands(commands: CommandRegistrar) {
+    private fun registerUtilityCommands(commands: Commands) {
         commands.register(
             VanishCommand().createVanishCommand(),
             "Toggle vanish mode"
@@ -97,10 +98,11 @@ class CommandBootstrapper : PluginBootstrap {
         )
     }
 
-    private fun registerWarpCommands(commands: CommandRegistrar) {
+    private fun registerWarpCommands(commands: Commands) {
         commands.register(
             WarpCommand.createWarpCommand(),
-            "Warp to a location"
+            "Warp to a location",
+            listOf("warps")
         )
 
         commands.register(
@@ -110,39 +112,41 @@ class CommandBootstrapper : PluginBootstrap {
 
         commands.register(
             DeleteWarpCommand.createDeleteWarpCommand(),
-            "Delete a warp"
+            "Delete a warp",
+            listOf("delwarp")
         )
     }
 
-    private fun registerHomeCommands(commands: CommandRegistrar) {
+    private fun registerHomeCommands(commands: Commands) {
         commands.register(
             HomesCommand.createHomesCommand(),
-            "Manage homes"
+            "Manage homes",
+            listOf("home")
         )
     }
 
-    private fun registerEconomyCommands(commands: CommandRegistrar) {
+    private fun registerEconomyCommands(commands: Commands) {
         commands.register(
             createEconomyCommand(),
             "Economy commands"
         )
     }
 
-    private fun registerKitCommands(commands: CommandRegistrar) {
+    private fun registerKitCommands(commands: Commands) {
         commands.register(
             KitCommand.createKitCommand(),
             "Receive a kit"
         )
     }
 
-    private fun registerTimeCommands(commands: CommandRegistrar) {
+    private fun registerTimeCommands(commands: Commands) {
         commands.register(
             createTimeCommand(),
             "Set or add time"
         )
     }
 
-    private fun registerWeatherCommands(commands: CommandRegistrar) {
+    private fun registerWeatherCommands(commands: Commands) {
         commands.register(
             WeatherCommand().createWeatherCommand(),
             "Set weather"
