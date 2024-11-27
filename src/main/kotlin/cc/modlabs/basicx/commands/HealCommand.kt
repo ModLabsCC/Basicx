@@ -8,6 +8,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
+import org.bukkit.attribute.Attribute
 
 class HealCommand : Command<CommandSourceStack> {
 
@@ -21,7 +22,7 @@ class HealCommand : Command<CommandSourceStack> {
             return Command.SINGLE_SUCCESS
         }
 
-        target.health = target.maxHealth
+        target.health = target.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
         target.send("commands.heal.success", default = "You have been healed.")
         sender.send("commands.heal.sender-success", mapOf("target" to targetName), default = "You have healed {target}.")
 

@@ -42,7 +42,7 @@ object MessageCache {
             return messagesFile.getString(key) ?: default
         }
 
-        messagesFile[key] = default
+        messagesFile[key] = "\${{variables.prefix}}$default"
         messagesFile.saveConfig()
 
         cacheLock.writeLock().lock()
