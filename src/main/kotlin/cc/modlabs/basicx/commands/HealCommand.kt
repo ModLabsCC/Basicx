@@ -9,6 +9,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.attribute.Attribute
+import org.bukkit.entity.Player
 
 class HealCommand : Command<CommandSourceStack> {
 
@@ -33,6 +34,17 @@ class HealCommand : Command<CommandSourceStack> {
         fun createHealCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("heal")
                 .requires { it.sender.hasPermission("basicx.heal") }
+                .executes { context ->
+                    val sender = context.source.sender
+                    if (sender !is Player) {
+                        sender.send("commands.heal.not-player", default = "Only players can use this command.")
+                        return@executes Command.SINGLE_SUCCESS
+                    }
+
+                    sender.health = sender.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
+                    sender.send("commands.heal.success", default = "You have been healed.")
+                    Command.SINGLE_SUCCESS
+                }
                 .then(Commands.argument("target", StringArgumentType.string())
                     .executes(HealCommand())
                 )

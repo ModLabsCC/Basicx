@@ -3,6 +3,8 @@ package cc.modlabs.basicx
 import cc.modlabs.basicx.cache.MessageCache
 import cc.modlabs.basicx.cache.WarpCache
 import cc.modlabs.basicx.cache.HomeCache
+import cc.modlabs.basicx.cache.KitCache
+import cc.modlabs.basicx.managers.ModuleManager
 import cc.modlabs.basicx.managers.RegisterManager
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.system.measureTimeMillis
@@ -22,16 +24,19 @@ class BasicX : JavaPlugin() {
         logger.info("Enabling BasicX...")
 
         // Copy the messages file to the plugins folder
+        saveDefaultConfig()
         saveResource("messages.yml", false)
+        saveResource("kits.yml", false)
 
         // Plugin startup logic
         val time = measureTimeMillis {
             MessageCache.loadCache()
             WarpCache.loadCache()
             HomeCache.loadCache()
-        }
+            KitCache.loadCache()
 
-        RegisterManager.registerListeners(this)
+            ModuleManager.startUp(this)
+        }
 
         logger.info("Plugin enabled in $time ms")
         logger.info("BasicX is now tweaking your server behavior!")

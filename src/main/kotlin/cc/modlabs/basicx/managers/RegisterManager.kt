@@ -38,15 +38,8 @@ object RegisterManager {
         }
     }
 
-    /**
-     * Registers listeners by iterating through a list of listener classes and registering them
-     * with the Bukkit plugin manager.
-     */
-    fun registerListeners(plugin: Plugin) {
-        val listenerClasses = loadClassesInPackage("cc.modlabs.basicx", Listener::class)
-
-        logger.info("Found ${listenerClasses.size} listener classes to register:")
-        listenerClasses.forEach { logger.info(it.simpleName) }
+    fun registerListenersForModule(plugin: Plugin, module: String) {
+        val listenerClasses = loadClassesInPackage("cc.modlabs.basicx.modules.${module}", Listener::class)
 
         var amountListeners = 0
         listenerClasses.forEach {
@@ -58,6 +51,7 @@ object RegisterManager {
                 logger.error("Failed to register listener: ${it.simpleName}", e)
             }
         }
-        logger.info("Registered $amountListeners listeners")
+        if (amountListeners == 0) return
+        plugin.logger.info("Registered $amountListeners listeners for module $module")
     }
 }

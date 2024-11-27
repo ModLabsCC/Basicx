@@ -1,0 +1,91 @@
+# Main Configuration File
+# This file contains settings for the server's database, modules, and additional features.
+
+# ========================================================================
+# Database Configuration
+# Configure the database used by the application. Supported types:
+# - MySQL, MariaDB, H2, PostgreSQL, SQLite (Compatible with Kotlin Exposed)
+# ========================================================================
+database:
+  type: mysql        # Database type (mysql, mariadb, h2, postgres, sqlite)
+  host: localhost    # Database host
+  port: 3306         # Port for the database connection
+  name: databaseName # Name of the database
+  username: user     # Database username
+  password: pass     # Database password
+  useSSL: true       # Use SSL for the connection (true/false)
+
+# ========================================================================
+# Module Configuration
+# Toggle individual modules on or off and adjust their settings.
+# ========================================================================
+modules:
+  join-quit:
+    enabled: true     # Enable/Disable Join and Quit messages
+
+  chat:
+    enabled: true     # Enable/Disable chat formatting
+    # Edit the chat format to your liking in messages.yml
+
+  kits:
+    enabled: true     # Enable/Disable kits
+    defaultKit: starter # Default kit players receive (none = no default kit)
+
+  homes:
+    enabled: true     # Enable/Disable homes
+
+  economy:
+    enabled: true     # Enable/Disable economy system
+
+  trash:
+    enabled: true     # Enable/Disable trash GUI
+
+  time:
+    enabled: true     # Enable/Disable time commands
+
+  weather:
+    enabled: true     # Enable/Disable weather commands
+
+  fly:
+    enabled: true     # Enable/Disable fly mode commands
+
+  warp:
+    enabled: true     # Enable/Disable warp system
+
+  teleports:
+    enabled: true     # Enable/Disable admin teleport system
+
+  teleport-requests:
+    enabled: true     # Enable/Disable teleport request system
+
+  gm:
+    enabled: true     # Enable/Disable game mode commands
+
+  invsee:
+    enabled: true     # Enable/Disable inventory viewing commands
+
+  itemedit:
+    enabled: true     # Enable/Disable item editing commands
+
+  feed:
+    enabled: true     # Enable/Disable feeding commands
+
+  heal:
+    enabled: true     # Enable/Disable healing commands
+
+  kit:
+    enabled: true     # Enable/Disable kit commands
+
+  vanish:
+    enabled: true     # Enable/Disable vanish mode commands
+
+  anvil:
+    enabled: true     # Enable/Disable anvil GUI
+
+# ========================================================================
+# Other Features
+# Configure miscellaneous settings for the server.
+# ========================================================================
+features:
+  debugMode: false         # Enable/Disable debug mode (useful for troubleshooting)
+  autoSaveInterval: 10     # Interval (in minutes) to auto-save server data

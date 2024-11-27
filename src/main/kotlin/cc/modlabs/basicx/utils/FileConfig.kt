@@ -1,6 +1,5 @@
 package cc.modlabs.basicx.utils
 
-import cc.modlabs.basicx.BasicX
 import dev.fruxz.ascend.extension.createFileAndDirectories
 import org.bukkit.configuration.InvalidConfigurationException
 import org.bukkit.configuration.file.YamlConfiguration
@@ -14,7 +13,7 @@ class FileConfig(fileName: String, fromRoot: Boolean = false) : YamlConfiguratio
     private val path: String = if (fromRoot) {
         fileName
     } else {
-        "plugins${seperator}${BasicX.instance.name}$seperator$fileName"
+        "plugins${seperator}BasicX$seperator$fileName"
     }
 
     fun saveConfig() {

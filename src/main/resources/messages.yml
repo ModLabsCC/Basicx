@@ -1,58 +1,103 @@
-
-### Variables are a way to reuse objects in your messages
-## You can define you own variables if you like.
-## Use them by including ${{variables.your-variable}} anywhere in this file
+# ## Variables are a way to reuse objects in your messages
+# # You can define you own variables if you like.
+# # Use them by including ${{variables.your-variable}} anywhere in this file
 variables:
   prefix: <gradient:#4a69bd:#6a89cc>BasicX</gradient> <color:#4a628f>>></color> <color:#b2c2d4>
+
+chat:
+  format: '%luckperms_prefix%<color:#c8d6e5>%playername%</color><color:#f6e58d>: ' # Chat message format
 
 commands:
   basicx:
     info:
-      version: ${{variables.prefix}} BasicX version {version}
-      reload: ${{variables.prefix}} <yellow>Reloading config...
+      version: ${{variables.prefix}}BasicX version {version}
+      reload: ${{variables.prefix}}<yellow>Reloading config...
       reload-success: ${{variables.prefix}} <green>Config reloaded!
+      reload-warn-config: '${{variables.prefix}}<#f0932b>Warning: For changes at the
+        config.yml to take effect, you need to restart the server!'
+    module:
+      disable:
+        success: ${{variables.prefix}}<green>Module {module} disabled
+      enable:
+        success: ${{variables.prefix}}<green>Module {module} enabled
   joinquit:
     join: <#C4E538>+ <#dfe6e9>%luckperms_prefix%{displayname}
     quit: <#EA2027>- <#dfe6e9>%luckperms_prefix%{displayname}
   economy:
-    balance: ${{variables.prefix}} Your balance is {balance}
+    balance: ${{variables.prefix}}Your balance is {balance}
   feed:
-    success: ${{variables.prefix}} You have been fed.
+    success: ${{variables.prefix}}You have been fed.
     sender-success: ${{variables.prefix}} You have fed {target}.
   heal:
-    success: ${{variables.prefix}} You have been healed.
-    sender-success: ${{variables.prefix}} You have healed {target}.
+    success: ${{variables.prefix}}You have been healed.
+    sender-success: ${{variables.prefix}}You have healed {target}.
   gm:
-    success: ${{variables.prefix}} Game mode set to {mode}.
+    success: ${{variables.prefix}}Game mode set to {mode}.
   invsee:
-    success: ${{variables.prefix}} You are now viewing {player}'s inventory.
+    success: ${{variables.prefix}}You are now viewing {player}'s inventory.
   itemedit:
-    invalid-enchantment: '${{variables.prefix}} Invalid enchantment: Poison'
+    invalid-enchantment: '${{variables.prefix}}Invalid enchantment: Poison'
   kit:
-    success: ${{variables.prefix}} You have received the {kit} kit.
+    success: ${{variables.prefix}}You have received the {kit} kit.
+    not-found: ${{variables.prefix}}Kit {kit} not found.
+    list: '${{variables.prefix}}Available kits are:'
+    list-entry: » <yellow><click:run_command:'/kit {kit}'><hover:show_text:'Click
+      to receive the {kit} kit'>{kit}</hover></click></yellow>
+    preview: '${{variables.prefix}}Previewing the {kit} kit:'
+    cooldown: ${{variables.prefix}}You must wait {time} seconds before using the {kit}
+      kit again.
+    preview-item: ${{variables.prefix}}{amount}x {item}
   tpa:
-    self-request: ${{variables.prefix}} You cannot send a teleport request to yourself.
+    self-request: ${{variables.prefix}}You cannot send a teleport request to yourself.
   trash:
     open: ${{variables.prefix}} <green>Trash GUI opened. Dispose of your items here.
   weather:
-    set: ${{variables.prefix}} Weather set to {type}
+    set: ${{variables.prefix}}Weather set to {type}
   homes:
     set:
-      success: ${{variables.prefix}} Home {homeName} set
+      success: ${{variables.prefix}}Home {homeName} set
     teleport:
-      success: ${{variables.prefix}} Teleported to home {homeName}
+      success: ${{variables.prefix}}Teleported to home {homeName}
     delete:
-      success: ${{variables.prefix}} Home {homeName} deleted
-    not-found: ${{variables.prefix}} Home {homeName} not found
-    list: '${{variables.prefix}} Your homes are:'
+      success: ${{variables.prefix}}Home {homeName} deleted
+    not-found: ${{variables.prefix}}Home {homeName} not found
+    list: '${{variables.prefix}}Your homes are:'
     list-entry: » <yellow><click:run_command:'/home {home}'>{home}</click></yellow>
   fly:
-    success: ${{variables.prefix}} Fly mode for {target} set to {enable}.
+    success: ${{variables.prefix}}Fly mode for {target} set to {enable}.
   warp:
-    list-empty: ${{variables.prefix}} There are no warps set.
-    list: '${{variables.prefix}} There are <yellow>{warps}</yellow> warps:'
+    list-empty: ${{variables.prefix}}There are no warps set.
+    list: '${{variables.prefix}}There are <yellow>{warps}</yellow> warps:'
     list-entry: » <yellow><click:run_command:'/warp {warp}'><hover:show_text:'Click
       to warp to {warp}'>{warp}</hover></click></yellow>
-    success: ${{variables.prefix}} Warped to {warpName}
+    success: ${{variables.prefix}}Warped to {warpName}
   createwarp:
-    success: ${{variables.prefix}} Warp {warpName} created
+    success: ${{variables.prefix}}Warp {warpName} created
+  time:
+    set: ${{variables.prefix}}Time set to {time}
+  vanish:
+    enabled: ${{variables.prefix}}You are now vanished.
+    disabled: ${{variables.prefix}}You are no longer vanished.
+
+modules:
+  list:
+    header: '---------<color:#b2c2d4> <color:#f5f6fa><click:run_command:''/basicx
+      module list {previousPage}''><hover:show_text:''Previous Page''>«</hover></click></color>
+      Modules Page {page} / {maxpages} <color:#f5f6fa><click:run_command:''/basicx
+      module list {nextPage}''><hover:show_text:''Next Page''>»</hover></click></color>
+      </color>---------'
+    enabled: <color:#6ab04c><hover:show_text:'<#badc58>Click to disable'><click:run_command:'/basicx
+      module disable {module}'>⚡ <#dfe6e9>{module}</click></hover></color>
+    footer: '---------<color:#b2c2d4> <color:#f5f6fa><click:run_command:''/basicx
+      module list {previousPage}''><hover:show_text:''Previous Page''>«</hover></click></color>
+      Modules Page {page} / {maxpages} <color:#f5f6fa><click:run_command:''/basicx
+      module list {nextPage}''><hover:show_text:''Next Page''>»</hover></click></color>
+      </color>---------'
+    runtime-disabled: <color:#ffbe76><hover:show_text:'<#badc58>This
+      module will be disabled on restart. Click to re-enable'><click:run_command:'/basicx
+      module enable {module}'>⚡ <#dfe6e9>{module}</click></hover></color>
+    disabled: <color:#eb4d4b><hover:show_text:'<#badc58>Click
+      to enable'><click:run_command:'/basicx module enable {module}'>⚡ <#dfe6e9>{module}</click></hover></color>
+    runtime-enabled: <color:#badc58><hover:show_text:'<#badc58>This
+      module was enabled at runtime. Some features might work not as expected. Click
+      to disable'><click:run_command:'/basicx module disable {module}'>⚡ <#dfe6e9>{module}</click></hover></color>
