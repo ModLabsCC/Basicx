@@ -2,6 +2,7 @@ package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.BasicX
 import cc.modlabs.basicx.cache.MessageCache
+import cc.modlabs.basicx.cache.WarpCache
 import cc.modlabs.basicx.extensions.sendMessagePrefixed
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
@@ -15,8 +16,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 object WarpCommand {
-
-    private val warps = mutableMapOf<String, Location>()
 
     fun createWarpCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("warp")
@@ -34,7 +33,7 @@ object WarpCommand {
 
     private fun warp(sender: CommandSender, warpName: String) {
         val player = sender as? Player ?: return
-        val location = warps[warpName]
+        val location = WarpCache.getWarp(warpName)
 
         if (location != null) {
             player.teleport(location)
@@ -45,10 +44,10 @@ object WarpCommand {
     }
 
     fun addWarp(warpName: String, location: Location) {
-        warps[warpName] = location
+        WarpCache.addWarp(warpName, location)
     }
 
     fun removeWarp(warpName: String) {
-        warps.remove(warpName)
+        WarpCache.removeWarp(warpName)
     }
 }
