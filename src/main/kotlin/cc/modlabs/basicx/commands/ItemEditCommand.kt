@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import dev.fruxz.stacked.text
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Material
@@ -17,11 +18,11 @@ class ItemEditCommand {
     fun register(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("itemedit")
             .requires { it.sender.hasPermission("basicx.itemedit") }
-            .then(Commands.literal("sign")
-                .then(Commands.argument("name", StringArgumentType.string())
-                    .executes { ctx -> signItem(ctx, StringArgumentType.getString(ctx, "name")) }
-                )
-            )
+//            .then(Commands.literal("sign")
+//                .then(Commands.argument("name", StringArgumentType.string())
+//                    .executes { ctx -> signItem(ctx, StringArgumentType.getString(ctx, "name")) }
+//                )
+//            )
             .then(Commands.literal("enchant")
                 .then(Commands.argument("enchantment", StringArgumentType.string())
                     .then(Commands.argument("level", IntegerArgumentType.integer(0))
@@ -46,7 +47,7 @@ class ItemEditCommand {
         }
 
         val meta = item.itemMeta
-        meta?.setDisplayName(name)
+        meta?.displayName(text(name))
         item.itemMeta = meta
 
         player.send("commands.itemedit.signed", mapOf("name" to name), default = "Item signed with name: $name")
@@ -83,7 +84,7 @@ class ItemEditCommand {
         }
 
         val meta = item.itemMeta
-        meta?.setDisplayName(name)
+        meta?.displayName(text(name))
         item.itemMeta = meta
 
         player.send("commands.itemedit.renamed", mapOf("name" to name), default = "Item renamed to: $name")

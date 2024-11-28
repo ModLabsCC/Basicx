@@ -1,5 +1,6 @@
 package cc.modlabs.basicx.managers
 
+import cc.modlabs.basicx.extensions.getLogger
 import cc.modlabs.basicx.extensions.send
 import cc.modlabs.basicx.modules.BasicXModule
 import cc.modlabs.basicx.modules.ModuleStatus
@@ -69,7 +70,7 @@ object ModuleManager {
 
 
     fun loadEnabledModulesFromConfig() {
-        val config = FileConfig("config.yml")
+        val config = FileConfig("config.yml").saveDefaultConfig()
         val modules = config.getConfigurationSection("modules")
         modules?.getKeys(false)?.forEach { module ->
             val status = if (config.getBoolean("modules.$module.enabled")) ModuleStatus.ENABLED else ModuleStatus.DISABLED
@@ -78,6 +79,7 @@ object ModuleManager {
             if (allModules.contains(basicXModule)) error("Module $basicXModule is already loaded")
             allModules[basicXModule] = status
         }
+        getLogger().info("Loaded ${allModules.size} modules - Enabled: ${allModules.filterValues { it == ModuleStatus.ENABLED }.size}")
     }
 
     fun startUp(plugin: Plugin) {

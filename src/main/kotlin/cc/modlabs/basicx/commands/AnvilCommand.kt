@@ -4,6 +4,7 @@ import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
+import dev.fruxz.stacked.text
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
@@ -23,9 +24,7 @@ class AnvilCommand : Command<CommandSourceStack> {
         }
 
         val player = sender as Player
-        val inventory: Inventory = Bukkit.createInventory(player, InventoryType.ANVIL, "Anvil")
-
-        player.openInventory(inventory)
+        player.openAnvil(null, true)
         return Command.SINGLE_SUCCESS
     }
 

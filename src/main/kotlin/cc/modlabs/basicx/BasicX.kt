@@ -24,7 +24,6 @@ class BasicX : JavaPlugin() {
         logger.info("Enabling BasicX...")
 
         // Copy the messages file to the plugins folder
-        saveDefaultConfig()
         saveResource("messages.yml", false)
         saveResource("kits.yml", false)
 
