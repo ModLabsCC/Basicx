@@ -1,7 +1,9 @@
 package cc.modlabs.basicx.modules.anvil
 
-import dev.fruxz.stacked.extension.asPlainString
+import cc.modlabs.basicx.managers.ModuleManager
+import cc.modlabs.basicx.modules.BasicXModule
 import dev.fruxz.stacked.text
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareAnvilEvent
@@ -12,17 +14,19 @@ class AnvilListener : Listener {
     @EventHandler
     fun onAnvilRename(event: PrepareAnvilEvent): Unit = with(event) {
         if (result == null) return
-        result = replaceItemName(result!!)
+        if (!ModuleManager.isModuleEnabled(BasicXModule.ANVIL)) return
+
+        val player = view.player as? Player ?: return
+        if (!player.hasPermission("basicx.anvil.rename")) return
+
+        val renameText = view.renameText ?: return
+        result = applyMiniMessageToItem(result!!, renameText)
     }
 
-    private fun replaceItemName(item: ItemStack): ItemStack {
-        item.itemMeta?.displayName(
-            text(
-                item.itemMeta?.displayName()?.asPlainString ?: item.type.name
-            )
-        )
+    private fun applyMiniMessageToItem(item: ItemStack, renameText: String): ItemStack {
+        val itemMeta = item.itemMeta ?: return item
+        itemMeta.displayName(text(renameText))
+        item.itemMeta = itemMeta
         return item
     }
-
-
 }
