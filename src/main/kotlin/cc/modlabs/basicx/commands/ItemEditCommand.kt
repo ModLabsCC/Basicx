@@ -172,7 +172,7 @@ class ItemEditCommand {
 
 
         item.addUnsafeEnchantment(enchantment, level)
-        player.send("commands.itemedit.enchanted", mapOf("enchantment" to enchantment.displayName(level)), default = "Item enchanted with {enchantment}")
+        player.send("commands.itemedit.enchanted", mapOf("enchantment" to enchantment.displayName(level).asStyledString), default = "Item enchanted with {enchantment}")
         return Command.SINGLE_SUCCESS
     }
 
