@@ -9,6 +9,9 @@ bootstrapper: cc.modlabs.basicx.CommandBootstrapper
 
 dependencies:
   server:
+    LuckPerms:
+      load: BEFORE
+      required: false
     PlaceholderAPI:
       load: BEFORE
       required: false

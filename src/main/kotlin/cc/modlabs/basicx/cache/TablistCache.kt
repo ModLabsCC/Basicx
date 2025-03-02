@@ -16,6 +16,7 @@ object TablistCache {
     private var playerTeams = mutableMapOf<UUID, Team>()
 
     fun loadLuckPerms(luckPerms: LuckPerms) {
+        getLogger().info("Loaded LuckPerms API")
         this.luckPerms = luckPerms
     }
 

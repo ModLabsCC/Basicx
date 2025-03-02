@@ -1,7 +1,6 @@
 package cc.modlabs.basicx.cache
 
-import cc.modlabs.kpaper.file.config.FileConfig
-import cc.modlabs.kpaper.file.config.PluginConfig
+import cc.modlabs.basicx.managers.FileConfig
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import java.util.UUID
@@ -58,7 +57,7 @@ object HomeCache {
         cacheLock.writeLock().lock()
         cache = mutableMapOf()
 
-        val homesFile = PluginConfig("homes.yml")
+        val homesFile = FileConfig("homes.yml")
         homesFile.getKeys(false).forEach { playerKey ->
             val playerUUID = UUID.fromString(playerKey)
             val playerHomes = mutableMapOf<String, Location>()
@@ -79,7 +78,7 @@ object HomeCache {
     }
 
     private fun saveCache() {
-        val homesFile = PluginConfig("homes.yml")
+        val homesFile = FileConfig("homes.yml")
 
         cache.forEach { (playerKey, playerHomes) ->
             playerHomes.forEach { (homeKey, location) ->
