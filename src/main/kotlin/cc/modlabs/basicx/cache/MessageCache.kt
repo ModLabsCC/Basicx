@@ -1,7 +1,7 @@
 package cc.modlabs.basicx.cache
 
-import cc.modlabs.basicx.extensions.getLogger
-import cc.modlabs.basicx.utils.FileConfig
+import cc.modlabs.kpaper.extensions.getLogger
+import cc.modlabs.kpaper.file.config.PluginConfig
 import dev.fruxz.stacked.extension.asStyledString
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
@@ -36,7 +36,7 @@ object MessageCache {
      * This should only be used for development purposes.
      */
     private fun createMessage(key: String, default: String): String {
-        val messagesFile = FileConfig("messages.yml")
+        val messagesFile = PluginConfig("messages.yml")
 
         if(messagesFile.contains(key)) {
             return messagesFile.getString(key) ?: default
@@ -58,7 +58,7 @@ object MessageCache {
         cache = mapOf()
 
         val tempCache = mutableMapOf<String, String>()
-        val messages = FileConfig("messages.yml")
+        val messages = PluginConfig("messages.yml")
         messages.getKeys(true).forEach {
             val message = messages.getString(it) ?: return@forEach
             tempCache[it] = message

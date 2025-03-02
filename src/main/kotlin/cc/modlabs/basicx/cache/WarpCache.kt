@@ -1,8 +1,9 @@
 package cc.modlabs.basicx.cache
 
-import cc.modlabs.basicx.utils.FileConfig
+import cc.modlabs.kpaper.file.config.PluginConfig
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.plugin.Plugin
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -46,7 +47,7 @@ object WarpCache {
         cacheLock.writeLock().lock()
         cache = mutableMapOf()
 
-        val warpsFile = FileConfig("warps.yml")
+        val warpsFile = PluginConfig("warps.yml")
         warpsFile.getKeys(false).forEach { key ->
             val world = Bukkit.getWorld(warpsFile.getString("$key.world") ?: return@forEach)
             val x = warpsFile.getDouble("$key.x")
@@ -62,7 +63,7 @@ object WarpCache {
     }
 
     private fun saveCache() {
-        val warpsFile = FileConfig("warps.yml")
+        val warpsFile = PluginConfig("warps.yml")
 
         cache.forEach { (key, location) ->
             warpsFile["$key.world"] = location.world?.name

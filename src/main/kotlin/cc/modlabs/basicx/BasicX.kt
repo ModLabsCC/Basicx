@@ -1,15 +1,13 @@
 package cc.modlabs.basicx
 
-import cc.modlabs.basicx.cache.MessageCache
-import cc.modlabs.basicx.cache.WarpCache
-import cc.modlabs.basicx.cache.HomeCache
-import cc.modlabs.basicx.cache.KitCache
+import cc.modlabs.basicx.cache.*
 import cc.modlabs.basicx.managers.ModuleManager
-import cc.modlabs.basicx.managers.RegisterManager
-import org.bukkit.plugin.java.JavaPlugin
+import cc.modlabs.kpaper.main.KPlugin
+import net.luckperms.api.LuckPerms
+import org.bukkit.Bukkit
 import kotlin.system.measureTimeMillis
 
-class BasicX : JavaPlugin() {
+class BasicX : KPlugin() {
 
     companion object {
         lateinit var instance: BasicX
@@ -20,7 +18,7 @@ class BasicX : JavaPlugin() {
         instance = this
     }
 
-    override fun onEnable() {
+    override fun startup() {
         logger.info("Enabling BasicX...")
 
         // Copy the messages file to the plugins folder
@@ -35,6 +33,16 @@ class BasicX : JavaPlugin() {
             KitCache.loadCache()
 
             ModuleManager.startUp(this)
+        }
+
+        try {
+            val provider = Bukkit.getServicesManager().getRegistration(LuckPerms::class.java)
+            if (provider != null) {
+                val luckPermsAPI = provider.provider
+                TablistCache.loadLuckPerms(luckPermsAPI)
+            }
+        } catch (e: Exception) {
+            logger.warning("Failed to load LuckPerms API")
         }
 
         logger.info("Plugin enabled in $time ms")

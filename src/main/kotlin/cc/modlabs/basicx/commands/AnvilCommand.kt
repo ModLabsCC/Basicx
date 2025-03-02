@@ -1,23 +1,17 @@
 package cc.modlabs.basicx.commands
 
+import cc.modlabs.kpaper.extensions.sender
 import com.mojang.brigadier.Command
-import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
-import dev.fruxz.stacked.text
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.InventoryType
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 
 class AnvilCommand : Command<CommandSourceStack> {
 
     override fun run(context: CommandContext<CommandSourceStack>): Int {
-        val sender = context.source.sender
+        val sender = context.sender
         if (sender !is Player) {
             sender.sendMessage("This command can only be executed by a player.")
             return Command.SINGLE_SUCCESS

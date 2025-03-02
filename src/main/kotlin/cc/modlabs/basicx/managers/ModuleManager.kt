@@ -1,10 +1,10 @@
 package cc.modlabs.basicx.managers
 
-import cc.modlabs.basicx.extensions.getLogger
 import cc.modlabs.basicx.extensions.send
 import cc.modlabs.basicx.modules.BasicXModule
 import cc.modlabs.basicx.modules.ModuleStatus
-import cc.modlabs.basicx.utils.FileConfig
+import cc.modlabs.klassicx.extensions.getLogger
+import cc.modlabs.kpaper.file.config.PluginConfig
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
@@ -70,7 +70,7 @@ object ModuleManager {
 
 
     fun loadEnabledModulesFromConfig() {
-        val config = FileConfig("config.yml").saveDefaultConfig()
+        val config = PluginConfig("config.yml")
         val modules = config.getConfigurationSection("modules")
         modules?.getKeys(false)?.forEach { module ->
             val status = if (config.getBoolean("modules.$module.enabled")) ModuleStatus.ENABLED else ModuleStatus.DISABLED
@@ -123,7 +123,7 @@ object ModuleManager {
     }
 
     private fun setModuleEnabled(basicXModule: BasicXModule, enabled: Boolean) {
-        val config = FileConfig("config.yml")
+        val config = PluginConfig("config.yml")
         config["modules.${basicXModule.packageName}.enabled"] = enabled
         config.saveConfig()
     }

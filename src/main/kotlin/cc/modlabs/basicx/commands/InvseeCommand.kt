@@ -11,7 +11,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 
-fun registerInvSeeCommand(): LiteralCommandNode<CommandSourceStack?>? {
+fun registerInvSeeCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("invsee")
         .then(Commands.argument("player", StringArgumentType.string())
             .executes { ctx -> execute(ctx) }

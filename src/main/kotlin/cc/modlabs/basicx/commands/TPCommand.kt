@@ -1,7 +1,7 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
-import cc.modlabs.basicx.extensions.sendTeleportSound
+import cc.modlabs.kpaper.extensions.sendTeleportSound
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.DoubleArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType

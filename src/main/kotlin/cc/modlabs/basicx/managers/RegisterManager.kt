@@ -1,7 +1,7 @@
 package cc.modlabs.basicx.managers
 
 import cc.modlabs.basicx.BasicX
-import cc.modlabs.basicx.extensions.getLogger
+import cc.modlabs.klassicx.extensions.getLogger
 import com.google.common.reflect.ClassPath
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener

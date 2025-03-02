@@ -1,7 +1,8 @@
 package cc.modlabs.basicx.cache
 
-import cc.modlabs.basicx.extensions.getLogger
-import cc.modlabs.basicx.utils.FileConfig
+import cc.modlabs.kpaper.extensions.getLogger
+import cc.modlabs.kpaper.file.config.FileConfig
+import cc.modlabs.kpaper.file.config.PluginConfig
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
@@ -45,7 +46,7 @@ object KitCache {
         cacheLock.writeLock().lock()
         cache = mutableMapOf()
 
-        val kitsFile = FileConfig("kits.yml")
+        val kitsFile = PluginConfig("kits.yml")
         val kitNames = kitsFile.getKeys(false)
 
         for (kitName in kitNames) {
@@ -68,7 +69,7 @@ object KitCache {
     }
 
     private fun saveCache() {
-        val kitsFile = FileConfig("kits.yml")
+        val kitsFile = PluginConfig("kits.yml")
 
         cache.forEach { (kitName, items) ->
             items.forEachIndexed { index, itemStack ->
