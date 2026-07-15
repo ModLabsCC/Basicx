@@ -1,8 +1,8 @@
 package cc.modlabs.basicx.extensions;
 
+import cc.modlabs.basicx.integrations.PlaceholderIntegration
 import dev.fruxz.stacked.extension.asPlainString
 import dev.fruxz.stacked.text
-import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
@@ -21,7 +21,7 @@ fun parsePlaceholders(text: String, player: Player): String {
    //parsed = parsed.replace("%translate_open_profile%", player.translate("chat.open_profile")?.message ?: "Open Profile")
 
     if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-        parsed = PlaceholderAPI.setPlaceholders(player, parsed)
+        parsed = PlaceholderIntegration.parse(player, parsed)
     }
 
     val plainText = text(parsed).asPlainString

@@ -1,28 +1,43 @@
 package cc.modlabs.basicx.cache
 
+import cc.modlabs.basicx.BasicX
+import cc.modlabs.basicx.integrations.PlaceholderIntegration
 import cc.modlabs.basicx.managers.FileConfig
-import cc.modlabs.kpaper.extensions.getLogger
-import dev.fruxz.stacked.extension.asStyledString
-import me.clip.placeholderapi.PlaceholderAPI
+import cc.modlabs.basicx.util.resolveMessageVariables
+import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.withLock
 
 object MessageCache {
 
     private val cacheLock: ReadWriteLock = ReentrantReadWriteLock()
     private var cache: Map<String, String> = mapOf()
+    private val reportedMissingKeys = ConcurrentHashMap.newKeySet<String>()
 
-    fun getMessage(key: String, commandSender: CommandSender = Bukkit.getConsoleSender(), placeholders: Map<String, Any> = emptyMap<String, String>(), default: String = key): String {
-        cacheLock.readLock().lock()
-        var message = cache[key]
-        cacheLock.readLock().unlock()
-        message = message ?: createMessage(key, default)
+    fun getMessage(
+        key: String,
+        commandSender: CommandSender = Bukkit.getConsoleSender(),
+        placeholders: Map<String, Any> = emptyMap(),
+        default: String = key,
+    ): String {
+        var message: String = cacheLock.readLock().withLock { cache[key] } ?: run {
+            if (reportedMissingKeys.add(key)) {
+                BasicX.instance.logger.warning("Missing message key '$key'; using its built-in default")
+            }
+            default
+        }
 
         for ((placeholder, value) in placeholders) {
-            message = message!!.replace("{$placeholder}", value.toString())
+            message = message.replace(
+                "{$placeholder}",
+                MiniMessage.miniMessage().escapeTags(value.toString()),
+            )
         }
         message = commandSender.replaceSenderPlaceholders(message)
 
@@ -30,33 +45,7 @@ object MessageCache {
         return message
     }
 
-    /**
-     * This is a developer function that creates a message with the specified key and default value.
-     * It is used to create messages that are not present in the messages.yml file.
-     * This should only be used for development purposes.
-     */
-    private fun createMessage(key: String, default: String): String {
-        val messagesFile = FileConfig("messages.yml")
-
-        if(messagesFile.contains(key)) {
-            return messagesFile.getString(key) ?: default
-        }
-
-        messagesFile[key] = "\${{variables.prefix}}$default"
-        messagesFile.saveConfig()
-
-        cacheLock.writeLock().lock()
-        cache = cache.plus(key to default)
-        cacheLock.writeLock().unlock()
-
-        getLogger().info("Created message $key with default value $default")
-        return default
-    }
-
     fun loadCache() {
-        cacheLock.writeLock().lock()
-        cache = mapOf()
-
         val tempCache = mutableMapOf<String, String>()
         val messages = FileConfig("messages.yml")
         messages.getKeys(true).forEach {
@@ -64,36 +53,26 @@ object MessageCache {
             tempCache[it] = message
         }
 
-        cache = parsePlaceholders(tempCache)
-        cacheLock.writeLock().unlock()
-    }
-
-    private fun parsePlaceholders(tempCache: MutableMap<String, String>): Map<String, String> {
-        val regex = Regex("\\$\\{\\{([a-zA-Z0-9_.]+)\\}\\}")
-        val resolvedCache = mutableMapOf<String, String>()
-
-        tempCache.forEach { (key, value) ->
-            val newValue = regex.replace(value) { matchResult ->
-                val variable = matchResult.groupValues[1]
-                tempCache[variable] ?: matchResult.value // Fallback to the original if not found
-            }
-            resolvedCache[key] = newValue
+        cacheLock.writeLock().withLock {
+            cache = resolveMessageVariables(tempCache)
         }
-
-        return resolvedCache
+        reportedMissingKeys.clear()
     }
 
     // Add placeholders with start and end %
-    val placeholderAPIRegex = Regex("%([a-zA-Z0-9_]+)%")
+    private val placeholderAPIRegex = Regex("%([a-zA-Z0-9_]+)%")
     private fun CommandSender.replaceSenderPlaceholders(inputMessage: String): String {
         var message = inputMessage
         message = message.replace("{player}", this.name)
 
         if (this is Player) {
-            message = message.replace("{displayname}", this.displayName().asStyledString)
+            message = message.replace(
+                "{displayname}",
+                PlainTextComponentSerializer.plainText().serialize(this.displayName()),
+            )
 
             if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-                message = PlaceholderAPI.setPlaceholders(player, message)
+                message = PlaceholderIntegration.parse(this, message)
             }
 
             message = placeholderAPIRegex.replace(message, "")

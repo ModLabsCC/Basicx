@@ -2,7 +2,10 @@ package cc.modlabs.basicx.commands
 
 
 import cc.modlabs.basicx.BasicX
+import cc.modlabs.basicx.cache.HomeCache
+import cc.modlabs.basicx.cache.KitCache
 import cc.modlabs.basicx.cache.MessageCache
+import cc.modlabs.basicx.cache.WarpCache
 import cc.modlabs.basicx.extensions.send
 import cc.modlabs.basicx.managers.ModuleManager
 import cc.modlabs.basicx.modules.BasicXModule
@@ -17,7 +20,11 @@ fun createBasicXCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("basicx")
         .executes { ctx ->
             val sender = ctx.source.sender
-            sender.send("commands.basicx.info.version", mapOf("version" to BasicX.instance.description.version), default = "BasicX version {version}")
+            sender.send(
+                "commands.basicx.info.version",
+                mapOf("version" to BasicX.instance.pluginMeta.version),
+                default = "BasicX version {version}",
+            )
             return@executes Command.SINGLE_SUCCESS
         }
         .then(Commands.literal("reload")
@@ -27,13 +34,17 @@ fun createBasicXCommand(): LiteralCommandNode<CommandSourceStack> {
 
                 sender.send("commands.basicx.info.reload", default = "<yellow>Reloading config...")
                 MessageCache.loadCache()
-                sender.send("commands.basicx.info.reload-success", default = "<green>Messages reloaded!")
-                sender.send("commands.basicx.info.reload-warn-config", default = "<#f0932b>Warning: For changes at the config.yml to take effect, you need to restart the server!")
+                WarpCache.loadCache()
+                HomeCache.loadCache()
+                KitCache.loadCache()
+                ModuleManager.loadEnabledModulesFromConfig()
+                sender.send("commands.basicx.info.reload-success", default = "<green>BasicX configuration reloaded.")
 
                 return@executes Command.SINGLE_SUCCESS
             }
         )
         .then(Commands.literal("module")
+            .requires { it.sender.hasPermission("basicx.manage") }
             .then(Commands.literal("list")
                 .executes { ctx ->
                     val sender = ctx.source.sender
@@ -58,7 +69,7 @@ fun createBasicXCommand(): LiteralCommandNode<CommandSourceStack> {
                             sender.send("commands.basicx.module.enable.not-found", mapOf("module" to moduleName), default = "<red>Module {module} not found")
                             return@run Command.SINGLE_SUCCESS
                         }
-                        ModuleManager.enableModule(module, BasicX.instance)
+                        ModuleManager.enableModule(module)
 
                         sender.send("commands.basicx.module.enable.success", mapOf("module" to module.packageName), default = "<green>Module {module} enabled")
 

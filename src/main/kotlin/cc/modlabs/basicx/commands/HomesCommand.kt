@@ -2,6 +2,9 @@ package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.cache.HomeCache
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
+import cc.modlabs.basicx.util.isSafeIdentifier
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -18,7 +21,7 @@ object HomesCommand {
 
     fun createHomesCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("homes")
-            .requires { it.sender.hasPermission("basicx.homes") }
+            .requires { it.canUseModule(BasicXModule.HOMES, "basicx.homes") }
             .executes { ctx ->
                 val sender = ctx.source.sender
                 if (sender !is Player) {
@@ -48,6 +51,13 @@ object HomesCommand {
                             return@executes Command.SINGLE_SUCCESS
                         }
                         val homeName = StringArgumentType.getString(ctx, "homeName")
+                        if (!isSafeIdentifier(homeName)) {
+                            sender.send(
+                                "commands.homes.invalid-name",
+                                default = "Home names may only contain letters, numbers, underscores, and hyphens.",
+                            )
+                            return@executes Command.SINGLE_SUCCESS
+                        }
                         setHome(sender, homeName)
                         Command.SINGLE_SUCCESS
                     }
@@ -120,7 +130,7 @@ object HomesCommand {
         val location = HomeCache.getHome(playerUUID, homeName)
 
         if (location != null) {
-            player.teleport(location)
+            player.teleportAsync(location)
             player.send("commands.homes.teleport.success", mapOf("homeName" to homeName), default = "Teleported to home {homeName}")
         } else {
             player.send("commands.homes.not-found", mapOf("homeName" to homeName), default = "Home {homeName} not found")

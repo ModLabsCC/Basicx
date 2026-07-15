@@ -1,6 +1,9 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
+import cc.modlabs.basicx.util.isSafeIdentifier
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
@@ -13,11 +16,18 @@ object CreateWarpCommand {
 
     fun createWarpCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("createwarp")
-            .requires { it.sender.hasPermission("basicx.createwarp") }
+            .requires { it.canUseModule(BasicXModule.WARP, "basicx.createwarp") }
             .then(Commands.argument("warpName", StringArgumentType.string())
                 .executes { ctx ->
                     val sender = ctx.source.sender
                     val warpName = StringArgumentType.getString(ctx, "warpName")
+                    if (!isSafeIdentifier(warpName)) {
+                        sender.send(
+                            "commands.createwarp.invalid-name",
+                            default = "Warp names may only contain letters, numbers, underscores, and hyphens.",
+                        )
+                        return@executes Command.SINGLE_SUCCESS
+                    }
                     createWarp(sender, warpName)
                     Command.SINGLE_SUCCESS
                 }

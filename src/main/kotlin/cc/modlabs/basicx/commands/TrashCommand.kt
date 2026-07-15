@@ -1,6 +1,8 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
@@ -13,7 +15,7 @@ import org.bukkit.entity.Player
 
 fun createTrashCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("trash")
-        .requires { it.sender.hasPermission("basicx.trash") }
+        .requires { it.canUseModule(BasicXModule.TRASH, "basicx.trash") }
         .executes { ctx -> openTrashGUI(ctx) }
         .build()
 }

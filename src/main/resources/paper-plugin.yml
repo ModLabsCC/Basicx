@@ -3,7 +3,7 @@ main: cc.modlabs.basicx.BasicX
 version: ${version}
 description: "All the basics for your minecraft paper server | Home | Warps | TPA | Vanish"
 author: "LiamXSage"
-api-version: "1.21"
+api-version: "26.2"
 loader: cc.modlabs.basicx.DependencyLoader
 bootstrapper: cc.modlabs.basicx.CommandBootstrapper
 
@@ -15,3 +15,83 @@ dependencies:
     PlaceholderAPI:
       load: BEFORE
       required: false
+
+permissions:
+  basicx.manage:
+    description: Reload BasicX and manage modules
+    default: op
+  basicx.tp:
+    description: Teleport to players or coordinates
+    default: op
+  basicx.tpa:
+    description: Send and answer teleport requests
+    default: true
+  basicx.invsee:
+    description: View another player's inventory
+    default: op
+  basicx.gm:
+    description: Change your game mode
+    default: op
+  basicx.itemedit:
+    description: Edit the held item
+    default: op
+  basicx.kit:
+    description: List, preview, and claim permitted kits
+    default: true
+  basicx.kit.starter:
+    description: Claim the starter kit
+    default: true
+  basicx.kits.reload:
+    description: Reload kit definitions
+    default: op
+  basicx.fly:
+    description: Manage flight
+    default: op
+  basicx.fly.others:
+    description: Manage flight for other players
+    default: op
+  basicx.trash:
+    description: Open the trash inventory
+    default: true
+  basicx.feed:
+    description: Feed yourself
+    default: op
+  basicx.feed.others:
+    description: Feed other players
+    default: op
+  basicx.heal:
+    description: Heal yourself
+    default: op
+  basicx.heal.others:
+    description: Heal other players
+    default: op
+  basicx.vanish:
+    description: Toggle your vanish state
+    default: op
+  basicx.vanish.others:
+    description: Toggle vanish for other players
+    default: op
+  basicx.anvil:
+    description: Open a virtual anvil
+    default: op
+  basicx.anvil.rename:
+    description: Use MiniMessage formatting in the BasicX anvil
+    default: op
+  basicx.warp:
+    description: List and use warps
+    default: true
+  basicx.createwarp:
+    description: Create warps
+    default: op
+  basicx.deletewarp:
+    description: Delete warps
+    default: op
+  basicx.homes:
+    description: Manage personal homes
+    default: true
+  basicx.time:
+    description: Change the time in all worlds
+    default: op
+  basicx.weather:
+    description: Change the weather in all worlds
+    default: op

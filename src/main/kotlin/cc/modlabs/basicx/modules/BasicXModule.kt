@@ -6,7 +6,6 @@ enum class BasicXModule(val packageName: String) {
     CHAT("chat"),
     KITS("kits"),
     HOMES("homes"),
-    ECONOMY("economy"),
     TRASH("trash"),
     TIME("time"),
     WEATHER("weather"),
@@ -19,7 +18,6 @@ enum class BasicXModule(val packageName: String) {
     ITEMEDIT("itemedit"),
     FEED("feed"),
     HEAL("heal"),
-    KIT("kit"),
     VANISH("vanish"),
     ANVIL("anvil"),
 

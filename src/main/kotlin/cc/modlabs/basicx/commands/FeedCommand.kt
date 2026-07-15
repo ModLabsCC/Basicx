@@ -1,6 +1,8 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -33,7 +35,7 @@ class FeedCommand : Command<CommandSourceStack> {
     companion object {
         fun createFeedCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("feed")
-                .requires { it.sender.hasPermission("basicx.feed") }
+                .requires { it.canUseModule(BasicXModule.FEED, "basicx.feed") }
                 .executes { context ->
                     val sender = context.source.sender
                     if (sender !is Player) {
@@ -47,6 +49,7 @@ class FeedCommand : Command<CommandSourceStack> {
                     Command.SINGLE_SUCCESS
                 }
                 .then(Commands.argument("target", StringArgumentType.string())
+                    .requires { it.sender.hasPermission("basicx.feed.others") }
                     .executes(FeedCommand())
                 )
                 .build()

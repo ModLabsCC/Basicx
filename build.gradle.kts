@@ -1,56 +1,58 @@
-import java.util.Calendar
-import java.util.TimeZone
+import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.4.10"
     id("io.papermc.paperweight.userdev") version "2.0.0-SNAPSHOT"
-    kotlin("plugin.serialization") version "2.1.10"
 }
 
-val pluginVersion: String by project
+val pluginVersion = providers.gradleProperty("pluginVersion").get()
+group = "cc.modlabs.basicx"
+version = pluginVersion
+val expandedPluginVersion = version.toString()
+val expandedProjectName = name
 
-val dailyVersion = Calendar.getInstance(TimeZone.getTimeZone("Europe/Berlin")).run {
-    "${get(Calendar.YEAR)}.${get(Calendar.MONTH) + 1}.${get(Calendar.DAY_OF_MONTH)}"
-}
-
-group = "cc.modlabs.worldengine"
-version = "$pluginVersion-$dailyVersion"
-
-val minecraftVersion: String by project
-
-val kotlinxCoroutinesCoreVersion: String by project
-val kotlinxCollectionsImmutableVersion: String by project
+val minecraftVersion = providers.gradleProperty("minecraftVersion").get()
+val kotlinxCoroutinesCoreVersion = providers.gradleProperty("kotlinxCoroutinesCoreVersion").get()
+val kotlinxCollectionsImmutableVersion = providers.gradleProperty("kotlinxCollectionsImmutableVersion").get()
 
 repositories {
-    maven("https://nexus.flawcra.cc/repository/maven-mirrors/")
+    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/") {
+        name = "PaperMC"
+    }
+    maven("https://repo-api.modlabs.cc/repo/maven/maven-public/") {
+        name = "ModLabs"
+    }
+    maven("https://repo.helpch.at/releases/") {
+        name = "PlaceholderAPI"
+    }
+    maven("https://repo.codemc.io/repository/maven-releases/") {
+        name = "CodeMC"
+    }
 }
 
-val deliverDependencies = listOf(
+val runtimeLibraries = listOf(
+    "org.jetbrains.kotlin:kotlin-stdlib:2.4.10",
+    "org.jetbrains.kotlin:kotlin-reflect:2.4.10",
     "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesCoreVersion",
     "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion",
-
-    "cc.modlabs:KPaper:2025.3.2.1238"
+    "cc.modlabs:KPaper:2026.7.13.0901",
 )
 
-val includedDependencies = mutableListOf<String>()
-
-fun Dependency?.deliver() = this?.apply {
-    val computedVersion = version ?: kotlin.coreLibrariesVersion
-    includedDependencies.add("${group}:${name}:${computedVersion}")
-}
-
 dependencies {
-    paperweight.paperDevBundle("$minecraftVersion-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("$minecraftVersion.build.+")
 
-    compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("net.luckperms", "api", "5.4")
+    compileOnly("me.clip:placeholderapi:2.12.3")
+    compileOnly("net.luckperms:api:5.5")
 
-    implementation(kotlin("stdlib")).deliver()
-    implementation(kotlin("reflect")).deliver()
-
-    deliverDependencies.forEach { dependency ->
-        implementation(dependency).deliver()
+    runtimeLibraries.forEach { dependency ->
+        implementation(dependency)
     }
+
+    testImplementation(platform("org.junit:junit-bom:6.1.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.register("generateDependenciesFile") {
@@ -61,14 +63,13 @@ tasks.register("generateDependenciesFile") {
     outputs.file(dependenciesFile)
     doLast {
         dependenciesFile.parentFile.mkdirs()
-        dependenciesFile.writeText(includedDependencies.joinToString("\n"))
+        dependenciesFile.writeText(runtimeLibraries.sorted().joinToString("\n", postfix = "\n"))
     }
 }
 
-
 tasks {
-    build {
-        dependsOn(reobfJar)
+    test {
+        useJUnitPlatform()
     }
 
     withType<ProcessResources> {
@@ -80,17 +81,10 @@ tasks {
 
         filesMatching("paper-plugin.yml") {
             expand(
-                "version" to project.version,
-                "name" to project.name,
+                "version" to expandedPluginVersion,
+                "name" to expandedProjectName,
             )
         }
-    }
-
-    register<JavaCompile>("compileMain") {
-        source = fileTree("src/main/java")
-        classpath = files(configurations.runtimeClasspath)
-        destinationDirectory.set(file("build/classes/kotlin/main"))
-        options.release.set(21)
     }
 }
 
@@ -101,17 +95,21 @@ configure<SourceSetContainer> {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
-        freeCompilerArgs.addAll(
-            listOf(
-                "-opt-in=kotlin.RequiresOptIn"
-            )
-        )
+        jvmTarget.set(JvmTarget.JVM_25)
+        allWarningsAsErrors.set(true)
+        freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
     }
 }
+
+paperweight {
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    })
+}
+
+paperweight.reobfArtifactConfiguration = ReobfArtifactConfiguration.MOJANG_PRODUCTION

@@ -2,6 +2,8 @@ package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.cache.KitCache
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -51,13 +53,14 @@ class KitCommand : Command<CommandSourceStack> {
     private fun giveKit(player: Player, kit: List<ItemStack>) {
         val inventory = player.inventory
         for (item in kit) {
-            inventory.addItem(item)
+            inventory.addItem(item.clone())
         }
     }
 
     companion object {
         fun createKitCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("kit")
+                .requires { it.canUseModule(BasicXModule.KITS, "basicx.kit") }
                 .executes { context ->
                     val sender = context.source.sender
 

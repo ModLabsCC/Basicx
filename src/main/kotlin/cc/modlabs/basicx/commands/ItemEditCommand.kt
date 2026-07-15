@@ -1,12 +1,13 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import dev.fruxz.stacked.extension.asStyledString
 import dev.fruxz.stacked.text
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
@@ -14,8 +15,8 @@ import io.papermc.paper.command.brigadier.MessageComponentSerializer
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Material
-import org.bukkit.Registry
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 
@@ -23,7 +24,7 @@ class ItemEditCommand {
 
     fun register(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("itemedit")
-            .requires { it.sender.hasPermission("basicx.itemedit") }
+            .requires { it.canUseModule(BasicXModule.ITEMEDIT, "basicx.itemedit") }
             .then(Commands.literal("enchant")
                 .then(Commands.argument("enchantment", ArgumentTypes.resource(RegistryKey.ENCHANTMENT))
                     .then(Commands.argument("level", IntegerArgumentType.integer(0))
@@ -74,7 +75,7 @@ class ItemEditCommand {
                             val lore = meta.lore() ?: return@suggests builder.buildFuture()
 
                             for (i in 0 until lore.size) {
-                                builder.suggest("$i", MessageComponentSerializer.message().serialize(text(lore[i].asStyledString)))
+                                builder.suggest("$i", MessageComponentSerializer.message().serialize(lore[i]))
                             }
                             builder.buildFuture()
                         }
@@ -172,7 +173,14 @@ class ItemEditCommand {
 
 
         item.addUnsafeEnchantment(enchantment, level)
-        player.send("commands.itemedit.enchanted", mapOf("enchantment" to enchantment.displayName(level).asStyledString), default = "Item enchanted with {enchantment}")
+        player.send(
+            "commands.itemedit.enchanted",
+            mapOf(
+                "enchantment" to PlainTextComponentSerializer.plainText()
+                    .serialize(enchantment.displayName(level)),
+            ),
+            default = "Item enchanted with {enchantment}",
+        )
         return Command.SINGLE_SUCCESS
     }
 

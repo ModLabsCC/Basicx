@@ -1,12 +1,18 @@
 package cc.modlabs.basicx.modules.chat
 
+import cc.modlabs.basicx.BasicX
 import cc.modlabs.basicx.cache.MessageCache
+import cc.modlabs.basicx.cache.OnlinePlayerCache
 import cc.modlabs.basicx.extensions.parsePlaceholders
-import dev.fruxz.stacked.extension.asPlainString
+import cc.modlabs.basicx.managers.ModuleManager
+import cc.modlabs.basicx.modules.BasicXModule
 import dev.fruxz.stacked.text
 import io.papermc.paper.event.player.AsyncChatEvent
-import org.bukkit.Bukkit
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextReplacementConfig
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 
 class ChatListener : Listener {
@@ -16,26 +22,30 @@ class ChatListener : Listener {
             return MessageCache.getMessage("chat.format")
         }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onChat(event: AsyncChatEvent): Unit = with(event) {
-        val messagePlain = message().asPlainString
+        if (!ModuleManager.isModuleEnabled(BasicXModule.CHAT)) return
 
-        // Highlight player names in the chat message
-        val highlightedMessage = highlightPlayerNames(messagePlain)
-
-        var format =
-            text(parsePlaceholders(chatFormat, player)).append(text(parsePlaceholders(highlightedMessage, player)))
-
-        event.renderer { _, _, _, _ ->
-            return@renderer format
-        }
+        val viewers = viewers().toList()
+        val originalMessage = message()
+        isCancelled = true
+        BasicX.instance.server.scheduler.runTask(BasicX.instance, Runnable {
+            val highlightedMessage = highlightPlayerNames(originalMessage)
+            val formattedMessage = text(parsePlaceholders(chatFormat, player))
+                .append(highlightedMessage)
+            viewers.forEach { viewer -> viewer.sendMessage(formattedMessage) }
+        })
     }
 
-    private fun highlightPlayerNames(message: String): String {
-        val playerNames = Bukkit.getOnlinePlayers().map { it.name }
+    private fun highlightPlayerNames(message: Component): Component {
         var highlightedMessage = message
-        playerNames.forEach { playerName ->
-            highlightedMessage = highlightedMessage.replace(playerName, "<color:#f6e58d>$playerName</color>")
+        OnlinePlayerCache.names().forEach { playerName ->
+            highlightedMessage = highlightedMessage.replaceText(
+                TextReplacementConfig.builder()
+                    .matchLiteral(playerName)
+                    .replacement(Component.text(playerName, NamedTextColor.YELLOW))
+                    .build(),
+            )
         }
         return highlightedMessage
     }

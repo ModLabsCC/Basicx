@@ -1,5 +1,7 @@
 package cc.modlabs.basicx.commands
 
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import cc.modlabs.basicx.extensions.send
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.IntegerArgumentType
@@ -12,7 +14,7 @@ import org.bukkit.entity.Player
 
 fun createGMCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("gm")
-        .requires { it.sender.hasPermission("basicx.gm") }
+        .requires { it.canUseModule(BasicXModule.GM, "basicx.gm") }
         .then(Commands.argument("mode", IntegerArgumentType.integer(0, 3))
             .executes { ctx -> setGameMode(ctx) }
         )

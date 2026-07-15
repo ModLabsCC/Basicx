@@ -1,6 +1,8 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import cc.modlabs.kpaper.extensions.sendTeleportSound
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.DoubleArgumentType
@@ -15,6 +17,7 @@ import org.bukkit.entity.Player
 
 fun createTPCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("tp")
+        .requires { it.canUseModule(BasicXModule.TELEPORT, "basicx.tp") }
         .then(Commands.argument("player", StringArgumentType.string())
             .executes { ctx -> executeTPPlayer(ctx) })
         .then(Commands.argument("x", DoubleArgumentType.doubleArg())
@@ -38,7 +41,7 @@ private fun executeTPPlayer(ctx: CommandContext<CommandSourceStack>): Int {
         return Command.SINGLE_SUCCESS
     }
 
-    sender.teleport(target.location)
+    sender.teleportAsync(target.location)
     sender.send("commands.tp.success", mapOf("player" to target.name), default = "Teleported to {player}.")
     sender.sendTeleportSound()
     return Command.SINGLE_SUCCESS
@@ -56,7 +59,7 @@ private fun executeTPCoordinates(ctx: CommandContext<CommandSourceStack>): Int {
     val z = DoubleArgumentType.getDouble(ctx, "z")
 
     val location = Location(sender.world, x, y, z)
-    sender.teleport(location)
+    sender.teleportAsync(location)
     sender.send("commands.tp.success-coordinates", mapOf("x" to x, "y" to y, "z" to z), default = "Teleported to {x}, {y}, {z}.")
     sender.sendTeleportSound()
     return Command.SINGLE_SUCCESS

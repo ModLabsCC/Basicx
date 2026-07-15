@@ -1,18 +1,18 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.BasicX
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.tree.LiteralCommandNode
-import dev.fruxz.ascend.extension.logging.getLogger
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 
 fun createTimeCommand(): LiteralCommandNode<CommandSourceStack> {
     return Commands.literal("time")
-        .requires { it.sender.hasPermission("basicx.time") }
+        .requires { it.canUseModule(BasicXModule.TIME, "basicx.time") }
         .then(Commands.literal("set")
             .then(Commands.argument("time", StringArgumentType.word())
                 .suggests { context, builder ->
@@ -23,7 +23,7 @@ fun createTimeCommand(): LiteralCommandNode<CommandSourceStack> {
                     val input = context.input.split(" ")
                     if (input.isEmpty()) return@suggests builder.buildFuture()
                     val time = input.last()
-                    if (time.first().isDigit()) {
+                    if (time.firstOrNull()?.isDigit() == true) {
                         for (i in 0..24) {
                             builder.suggest("${i}h")
                         }

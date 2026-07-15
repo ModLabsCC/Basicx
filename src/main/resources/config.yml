@@ -1,19 +1,5 @@
 # Main Configuration File
-# This file contains settings for the server's database, modules, and additional features.
-
-# ========================================================================
-# Database Configuration
-# Configure the database used by the application. Supported types:
-# - MySQL, MariaDB, H2, PostgreSQL, SQLite (Compatible with Kotlin Exposed)
-# ========================================================================
-database:
-  type: mysql        # Database type (mysql, mariadb, h2, postgres, sqlite)
-  host: localhost    # Database host
-  port: 3306         # Port for the database connection
-  name: databaseName # Name of the database
-  username: user     # Database username
-  password: pass     # Database password
-  useSSL: true       # Use SSL for the connection (true/false)
+# This file controls BasicX modules and features.
 
 # ========================================================================
 # Module Configuration
@@ -29,13 +15,9 @@ modules:
 
   kits:
     enabled: true     # Enable/Disable kits
-    defaultKit: starter # Default kit players receive (none = no default kit)
 
   homes:
     enabled: true     # Enable/Disable homes
-
-  economy:
-    enabled: true     # Enable/Disable economy system
 
   trash:
     enabled: true     # Enable/Disable trash GUI
@@ -52,7 +34,7 @@ modules:
   warp:
     enabled: true     # Enable/Disable warp system
 
-  teleports:
+  teleport:
     enabled: true     # Enable/Disable admin teleport system
 
   teleport-requests:
@@ -73,19 +55,8 @@ modules:
   heal:
     enabled: true     # Enable/Disable healing commands
 
-  kit:
-    enabled: true     # Enable/Disable kit commands
-
   vanish:
     enabled: true     # Enable/Disable vanish mode commands
 
   anvil:
     enabled: true     # Enable/Disable anvil GUI
-
-# ========================================================================
-# Other Features
-# Configure miscellaneous settings for the server.
-# ========================================================================
-features:
-  debugMode: false         # Enable/Disable debug mode (useful for troubleshooting)
-  autoSaveInterval: 10     # Interval (in minutes) to auto-save server data

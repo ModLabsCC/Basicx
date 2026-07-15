@@ -1,6 +1,8 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -13,7 +15,7 @@ class WeatherCommand {
 
     fun createWeatherCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("weather")
-            .requires { it.sender.hasPermission("basicx.weather") }
+            .requires { it.canUseModule(BasicXModule.WEATHER, "basicx.weather") }
             .then(Commands.argument("type", StringArgumentType.word())
                 .suggests { _, builder ->
                     builder.suggest("clear")

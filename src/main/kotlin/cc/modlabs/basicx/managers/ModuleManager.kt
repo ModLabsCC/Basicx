@@ -3,17 +3,19 @@ package cc.modlabs.basicx.managers
 import cc.modlabs.basicx.extensions.send
 import cc.modlabs.basicx.modules.BasicXModule
 import cc.modlabs.basicx.modules.ModuleStatus
-import cc.modlabs.klassicx.extensions.getLogger
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
+import java.util.logging.Logger
 import kotlin.math.ceil
+import kotlin.math.max
 
 object ModuleManager {
 
+    private val logger = Logger.getLogger(ModuleManager::class.java.name)
     private val allModules = mutableMapOf<BasicXModule, ModuleStatus>()
     val maxPages: Int
-        get() = ceil(allModules.size / 8.0).toInt()
+        get() = max(1, ceil(allModules.size / 8.0).toInt())
 
     init {
         loadEnabledModulesFromConfig()
@@ -70,22 +72,27 @@ object ModuleManager {
 
     fun loadEnabledModulesFromConfig() {
         val config = FileConfig("config.yml").saveDefaultConfig()
-        val modules = config.getConfigurationSection("modules")
-        modules?.getKeys(false)?.forEach { module ->
-            val status = if (config.getBoolean("modules.$module.enabled")) ModuleStatus.ENABLED else ModuleStatus.DISABLED
-            val basicXModule = BasicXModule.entries.firstOrNull { it.packageName == module } ?: return@forEach
-
-            if (allModules.contains(basicXModule)) error("Module $basicXModule is already loaded")
-            allModules[basicXModule] = status
+        allModules.clear()
+        var addedDefaults = false
+        BasicXModule.entries.forEach { module ->
+            val path = "modules.${module.packageName}.enabled"
+            if (!config.contains(path)) {
+                config[path] = true
+                addedDefaults = true
+            }
+            allModules[module] = if (config.getBoolean(path)) {
+                ModuleStatus.ENABLED
+            } else {
+                ModuleStatus.DISABLED
+            }
         }
-        getLogger().info("Loaded ${allModules.size} modules - Enabled: ${allModules.filterValues { it == ModuleStatus.ENABLED }.size}")
+        if (addedDefaults) config.saveConfig()
+        logger.info("Loaded ${allModules.size} modules - Enabled: ${allModules.filterValues { it == ModuleStatus.ENABLED }.size}")
     }
 
     fun startUp(plugin: Plugin) {
-        allModules.forEach { (module, status) ->
-            if (status == ModuleStatus.ENABLED) {
-                RegisterManager.registerListenersForModule(plugin, module.packageName)
-            }
+        BasicXModule.entries.forEach { module ->
+            RegisterManager.registerListenersForModule(plugin, module.packageName)
         }
     }
 
@@ -95,16 +102,9 @@ object ModuleManager {
      * @param basicXModule The module to enable.
      * @param plugin The plugin instance.
      */
-    fun enableModule(basicXModule: BasicXModule, plugin: Plugin) {
-        val previousStatus = allModules[basicXModule] ?: ModuleStatus.DISABLED
+    fun enableModule(basicXModule: BasicXModule) {
         allModules[basicXModule] = ModuleStatus.RUNTIME_ENABLED
         setModuleEnabled(basicXModule, true)
-
-        if (previousStatus != ModuleStatus.RUNTIME_DISABLED) {
-            RegisterManager.registerListenersForModule(plugin, basicXModule.packageName)
-        }
-
-        // Todo: Add command
     }
 
     fun isModuleEnabled(basicXModule: BasicXModule): Boolean {
@@ -116,7 +116,6 @@ object ModuleManager {
     }
 
     fun disableModule(basicXModule: BasicXModule) {
-        if (!allModules.contains(basicXModule)) error("Module $basicXModule is not enabled")
         allModules[basicXModule] = ModuleStatus.RUNTIME_DISABLED
         setModuleEnabled(basicXModule, false)
     }
@@ -126,4 +125,5 @@ object ModuleManager {
         config["modules.${basicXModule.packageName}.enabled"] = enabled
         config.saveConfig()
     }
+
 }

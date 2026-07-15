@@ -1,54 +1,53 @@
 package cc.modlabs.basicx.managers
 
 import cc.modlabs.basicx.BasicX
-import cc.modlabs.klassicx.extensions.getLogger
 import com.google.common.reflect.ClassPath
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
-import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
+import java.util.logging.Level
 
 object RegisterManager {
 
-    private val logger = getLogger()
+    private val logger
+        get() = BasicX.instance.logger
 
-    private fun <T : Any> loadClassesInPackage(packageName: String, clazzType: KClass<T>): List<KClass<out T>> {
+    private fun loadListenersInPackage(packageName: String): List<Class<out Listener>> {
         try {
             val classLoader = BasicX.instance.javaClass.classLoader
             val allClasses = ClassPath.from(classLoader).allClasses
-            val classes = mutableListOf<KClass<out T>>()
+            val classes = mutableListOf<Class<out Listener>>()
             for (classInfo in allClasses) {
                 if (!classInfo.name.startsWith("cc.modlabs.basicx")) continue
                 if (classInfo.packageName.startsWith(packageName) && !classInfo.name.contains('$')) {
                     try {
-                        val loadedClass = classInfo.load().kotlin
-                        if (clazzType.isInstance(loadedClass.javaObjectType.getDeclaredConstructor().newInstance())) {
-                            classes.add(loadedClass as KClass<out T>)
+                        val loadedClass = classInfo.load()
+                        if (Listener::class.java.isAssignableFrom(loadedClass)) {
+                            classes.add(loadedClass.asSubclass(Listener::class.java))
                         }
-                    } catch (_: Exception) {
-                        // Ignore, as this is not a class we need to load
+                    } catch (_: LinkageError) {
+                        // An optional dependency for this class is unavailable.
                     }
                 }
             }
             return classes
         } catch (exception: Exception) {
-            logger.error("Failed to load classes", exception)
+            logger.log(Level.SEVERE, "Failed to load classes", exception)
             return emptyList()
         }
     }
 
     fun registerListenersForModule(plugin: Plugin, module: String) {
-        val listenerClasses = loadClassesInPackage("cc.modlabs.basicx.modules.${module}", Listener::class)
+        val listenerClasses = loadListenersInPackage("cc.modlabs.basicx.modules.$module")
 
         var amountListeners = 0
         listenerClasses.forEach {
             try {
-                val listener = it.primaryConstructor?.call() as Listener
+                val listener = it.getDeclaredConstructor().newInstance()
                 Bukkit.getPluginManager().registerEvents(listener, plugin)
                 amountListeners++
             } catch (e: Exception) {
-                logger.error("Failed to register listener: ${it.simpleName}", e)
+                logger.log(Level.SEVERE, "Failed to register listener: ${it.simpleName}", e)
             }
         }
         if (amountListeners == 0) return

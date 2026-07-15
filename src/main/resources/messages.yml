@@ -13,8 +13,6 @@ commands:
       version: ${{variables.prefix}}BasicX version {version}
       reload: ${{variables.prefix}}<yellow>Reloading config...
       reload-success: ${{variables.prefix}} <green>Config reloaded!
-      reload-warn-config: '${{variables.prefix}}<#f0932b>Warning: For changes at the
-        config.yml to take effect, you need to restart the server!'
     module:
       disable:
         success: ${{variables.prefix}}<green>Module {module} disabled
@@ -23,8 +21,6 @@ commands:
   joinquit:
     join: <#C4E538>+ <#dfe6e9>%luckperms_prefix%{displayname}
     quit: <#EA2027>- <#dfe6e9>%luckperms_prefix%{displayname}
-  economy:
-    balance: ${{variables.prefix}}Your balance is {balance}
   feed:
     success: ${{variables.prefix}}You have been fed.
     sender-success: ${{variables.prefix}} You have fed {target}.

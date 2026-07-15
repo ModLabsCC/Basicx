@@ -1,10 +1,7 @@
 package cc.modlabs.basicx.cache
 
-import cc.modlabs.klassicx.extensions.getLogger
-import cc.modlabs.klassicx.extensions.to3DigitsReversed
-import cc.modlabs.kpaper.coroutines.sync
+import cc.modlabs.basicx.BasicX
 import dev.fruxz.stacked.text
-import net.luckperms.api.LuckPerms
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Team
@@ -12,16 +9,21 @@ import java.util.*
 
 object TablistCache {
 
-    private var luckPerms: LuckPerms? = null
+    private var prefixProvider: ((Player) -> String)? = null
+    private var weightProvider: ((Player) -> String)? = null
     private var playerTeams = mutableMapOf<UUID, Team>()
 
-    fun loadLuckPerms(luckPerms: LuckPerms) {
-        getLogger().info("Loaded LuckPerms API")
-        this.luckPerms = luckPerms
+    fun configureLuckPerms(
+        prefixProvider: (Player) -> String,
+        weightProvider: (Player) -> String,
+    ) {
+        BasicX.instance.logger.info("Loaded LuckPerms API")
+        this.prefixProvider = prefixProvider
+        this.weightProvider = weightProvider
     }
 
     fun onPlayerJoin(player: Player) {
-        if (luckPerms == null) return
+        if (prefixProvider == null) return
         recalculatePlayer(player)
     }
 
@@ -32,55 +34,54 @@ object TablistCache {
 
     fun updateTeam(team: Team, player: Player): Team {
         val prefix = getPlayerPrefix(player)
-        sync {
-            if (prefix.isNotEmpty()) {
-                team.prefix(text(prefix))
-            }
+        if (prefix.isNotEmpty()) {
+            team.prefix(text(prefix))
         }
         return team
     }
 
     fun deleteTeam(player: Player) {
-        sync {
-            player.scoreboard.getEntityTeam(player)?.unregister()
-            val team = playerTeams[player.uniqueId] ?: return@sync
-            team.unregister()
-        }
+        val team = playerTeams.remove(player.uniqueId) ?: return
+        team.removeEntry(player.name)
+        team.unregister()
     }
 
     private fun addPlayerToTeam(player: Player) {
-
-        sync {
-            val team = getOrCreateTeam(player)
-            team.addPlayer(player)
-            getLogger().info("Added ${player.name} to team ${team.name}")
-        }
+        val team = getOrCreateTeam(player)
+        team.addEntry(player.name)
+        playerTeams[player.uniqueId] = team
     }
 
     private fun getPlayerPrefix(player: Player): String {
-        val user = luckPerms!!.getPlayerAdapter(Player::class.java).getUser(player)
-        val groupName = user.primaryGroup
-        val group = luckPerms!!.groupManager.getGroup(groupName)
-        return group?.cachedData?.metaData?.prefix ?: ""
+        return prefixProvider?.invoke(player).orEmpty()
     }
 
     private fun getPlayerGroupWeight(player: Player): String {
-        if (luckPerms == null) return "999"
-        val user = luckPerms!!.getPlayerAdapter(Player::class.java).getUser(player)
-        val groupName = user.primaryGroup
-        val group = luckPerms!!.groupManager.getGroup(groupName) ?: return "999"
-        return group.weight.to3DigitsReversed
+        return weightProvider?.invoke(player) ?: "999"
     }
 
     private fun getOrCreateTeam(player: Player): Team {
         if (playerTeams.containsKey(player.uniqueId)) return updateTeam(playerTeams[player.uniqueId]!!, player)
 
         val groupWeight = getPlayerGroupWeight(player)
-        val teamName = "${groupWeight}-${player.name}"
+        val teamName = "${groupWeight}_${player.uniqueId.toString().take(8)}"
         val team = Bukkit.getScoreboardManager().mainScoreboard.getTeam(teamName)
-        if (team != null) return updateTeam(team, player)
+        if (team != null) {
+            playerTeams[player.uniqueId] = team
+            return updateTeam(team, player)
+        }
 
         val newTeam = Bukkit.getScoreboardManager().mainScoreboard.registerNewTeam(teamName)
+        playerTeams[player.uniqueId] = newTeam
         return updateTeam(newTeam, player)
+    }
+
+    fun clear() {
+        playerTeams.values.toSet().forEach { team ->
+            runCatching(team::unregister)
+        }
+        playerTeams.clear()
+        prefixProvider = null
+        weightProvider = null
     }
 }

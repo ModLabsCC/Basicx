@@ -1,29 +1,35 @@
 package cc.modlabs.basicx
 
 import cc.modlabs.basicx.cache.*
+import cc.modlabs.basicx.integrations.LuckPermsIntegration
+import cc.modlabs.basicx.managers.AnvilSessionManager
+import cc.modlabs.basicx.managers.ConfigWriter
+import cc.modlabs.basicx.managers.FileConfig
 import cc.modlabs.basicx.managers.ModuleManager
-import cc.modlabs.kpaper.main.KPlugin
-import net.luckperms.api.LuckPerms
+import cc.modlabs.basicx.managers.TeleportRequestManager
+import cc.modlabs.basicx.managers.VanishManager
 import org.bukkit.Bukkit
+import org.bukkit.plugin.java.JavaPlugin
 import kotlin.system.measureTimeMillis
 
-class BasicX : KPlugin() {
+class BasicX : JavaPlugin() {
 
     companion object {
         lateinit var instance: BasicX
             private set
     }
 
-    init {
+    override fun onEnable() {
         instance = this
-    }
-
-    override fun startup() {
+        FileConfig.configure(dataFolder.toPath())
         logger.info("Enabling BasicX...")
 
-        // Copy the messages file to the plugins folder
-        saveResource("messages.yml", false)
-        saveResource("kits.yml", false)
+        if (!dataFolder.resolve("messages.yml").exists()) {
+            saveResource("messages.yml", false)
+        }
+        if (!dataFolder.resolve("kits.yml").exists()) {
+            saveResource("kits.yml", false)
+        }
 
         // Plugin startup logic
         val time = measureTimeMillis {
@@ -31,21 +37,34 @@ class BasicX : KPlugin() {
             WarpCache.loadCache()
             HomeCache.loadCache()
             KitCache.loadCache()
+            Bukkit.getOnlinePlayers().forEach { OnlinePlayerCache.add(it.name) }
 
             ModuleManager.startUp(this)
         }
 
-        try {
-            val provider = Bukkit.getServicesManager().getRegistration(LuckPerms::class.java)
-            if (provider != null) {
-                val luckPermsAPI = provider.provider
-                TablistCache.loadLuckPerms(luckPermsAPI)
+        if (server.pluginManager.isPluginEnabled("LuckPerms")) {
+            try {
+                LuckPermsIntegration.load()
+            } catch (exception: Exception) {
+                logger.warning("Failed to load LuckPerms API: ${exception.message}")
+            } catch (error: LinkageError) {
+                logger.warning("LuckPerms integration is unavailable: ${error.message}")
             }
-        } catch (e: Exception) {
-            logger.warning("Failed to load LuckPerms API")
         }
 
         logger.info("Plugin enabled in $time ms")
         logger.info("BasicX is now tweaking your server behavior!")
+    }
+
+    override fun onDisable() {
+        HomeCache.flush()
+        WarpCache.flush()
+        KitCache.flush()
+        ConfigWriter.shutdown()
+        TablistCache.clear()
+        OnlinePlayerCache.clear()
+        TeleportRequestManager.clear()
+        VanishManager.clear()
+        AnvilSessionManager.clear()
     }
 }

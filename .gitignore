@@ -27,6 +27,14 @@ bin/
 
 .kotlin
 
+### Local Paper servers ###
+/run/
+/server/
+/plugins/
+/logs/
+/world*/
+/eula.txt
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

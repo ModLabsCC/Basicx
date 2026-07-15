@@ -2,6 +2,8 @@ package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.cache.WarpCache
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -19,7 +21,7 @@ object WarpCommand {
 
     fun createWarpCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("warp")
-            .requires { it.sender.hasPermission("basicx.warp") }
+            .requires { it.canUseModule(BasicXModule.WARP, "basicx.warp") }
             .executes { ctx ->
                 val sender = ctx.source.sender
                 if (sender !is Player) {
@@ -69,7 +71,7 @@ object WarpCommand {
         val location = WarpCache.getWarp(warpName)
 
         if (location != null) {
-            player.teleport(location)
+            player.teleportAsync(location)
             player.send("commands.warp.success", mapOf("warpName" to warpName), default = "Warped to {warpName}")
         } else {
             player.send("commands.warp.not-found", mapOf("warpName" to warpName), default = "Warp {warpName} not found")

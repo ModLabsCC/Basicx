@@ -4,7 +4,7 @@ import cc.modlabs.basicx.commands.*
 import cc.modlabs.basicx.commands.FeedCommand.Companion.createFeedCommand
 import cc.modlabs.basicx.commands.HealCommand.Companion.createHealCommand
 import cc.modlabs.basicx.commands.KitCommand.Companion.createKitCommand
-import cc.modlabs.basicx.managers.ModuleManager
+import cc.modlabs.basicx.managers.FileConfig
 import cc.modlabs.basicx.modules.BasicXModule
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
@@ -21,7 +21,6 @@ class CommandBootstrapper : PluginBootstrap {
         BasicXModule.ITEMEDIT to ::registerItemEditCommand,
         BasicXModule.WARP to ::registerWarpCommands,
         BasicXModule.HOMES to ::registerHomeCommands,
-        BasicXModule.ECONOMY to ::registerEconomyCommands,
         BasicXModule.TRASH to ::registerTrashCommand,
         BasicXModule.TIME to ::registerTimeCommands,
         BasicXModule.WEATHER to ::registerWeatherCommands,
@@ -34,15 +33,14 @@ class CommandBootstrapper : PluginBootstrap {
     )
 
     override fun bootstrap(context: BootstrapContext) {
+        FileConfig.configure(context.dataDirectory)
         val manager = context.lifecycleManager
 
         manager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             val commands = event.registrar()
 
-            for ((module, register) in moduleFunctions) {
-                if (ModuleManager.isModuleEnabled(module)) {
-                    register(commands)
-                }
+            for (register in moduleFunctions.values) {
+                register(commands)
             }
 
             registerPluginManagementCommands(commands)
@@ -67,6 +65,14 @@ class CommandBootstrapper : PluginBootstrap {
         commands.register(
             createTPACommand(),
             "Request to teleport to a player"
+        )
+        commands.register(
+            createTPAcceptCommand(),
+            "Accept a pending teleport request",
+        )
+        commands.register(
+            createTPDenyCommand(),
+            "Deny a pending teleport request",
         )
     }
 
@@ -164,13 +170,6 @@ class CommandBootstrapper : PluginBootstrap {
             HomesCommand.createHomesCommand(),
             "Manage homes",
             listOf("home")
-        )
-    }
-
-    private fun registerEconomyCommands(commands: Commands) {
-        commands.register(
-            createEconomyCommand(),
-            "Economy commands"
         )
     }
 

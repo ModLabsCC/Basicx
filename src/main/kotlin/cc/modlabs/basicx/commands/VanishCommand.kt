@@ -1,7 +1,9 @@
 package cc.modlabs.basicx.commands
 
-import cc.modlabs.basicx.BasicX
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.managers.VanishManager
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
@@ -11,13 +13,12 @@ import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.metadata.FixedMetadataValue
 
 class VanishCommand {
 
     fun createVanishCommand(): LiteralCommandNode<CommandSourceStack> {
         return Commands.literal("vanish")
-            .requires { it.sender.hasPermission("basicx.vanish") }
+            .requires { it.canUseModule(BasicXModule.VANISH, "basicx.vanish") }
             .then(Commands.argument("state", BoolArgumentType.bool())
                 .executes { ctx -> executeVanish(ctx, BoolArgumentType.getBool(ctx, "state")) }
             )
@@ -45,14 +46,11 @@ class VanishCommand {
             }
         }
 
-        val vanishState = state ?: !targetPlayer.hasMetadata("vanished")
+        val vanishState = state ?: !VanishManager.isVanished(targetPlayer)
+        VanishManager.setVanished(targetPlayer, vanishState)
         if (vanishState) {
-            targetPlayer.setMetadata("vanished", FixedMetadataValue(BasicX.instance, true))
-            Bukkit.getOnlinePlayers().forEach { it.hidePlayer(BasicX.instance, targetPlayer) }
             targetPlayer.send("commands.vanish.enabled", default = "You are now vanished.")
         } else {
-            targetPlayer.removeMetadata("vanished", BasicX.instance)
-            Bukkit.getOnlinePlayers().forEach { it.showPlayer(BasicX.instance, targetPlayer) }
             targetPlayer.send("commands.vanish.disabled", default = "You are no longer vanished.")
         }
 

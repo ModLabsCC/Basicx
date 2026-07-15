@@ -1,17 +1,51 @@
-<br />
-<div align="center">
-  <a href="https://discord.com/users/216487432667791360">
-    <img src="https://github.com/ModLabsCC/Basicx/blob/main/.github/assets/basicx.png" alt="Logo" width="200" height="200">
-</a>
+# BasicX
 
-<h3 align="center">BasicX</h3>
+BasicX is a modular Paper plugin providing homes, warps, teleport requests, vanish, kits, moderation utilities, item editing, chat formatting, and time/weather controls.
 
-  <p align="center">
-    All the basics for your minecraft paper server | Home | Warps | TPA | Vanish | TP | Invsee | GM (0 1 2 3) | Item Editing (Signing, Enchanting, Renaming) | /trash (GUI for item disposal) | /feed | /heal | /fly | /anvil | /warp (with /createwarp and /deletewarp) | /homes | Economy System | Kit System (with starter kit) | Time & Weather command
-    <br />
-    <br />
-    <a href="https://liamxsage.com">Website</a>
-    ·
-    <a href="https://discord.com/users/216487432667791360"><strong>Contact</strong></a>
-  </p>
-</div>
+## Requirements
+
+- Java 25
+- Paper 26.2 experimental
+- Optional: LuckPerms 5.x and PlaceholderAPI 2.12.3+
+
+Paper 26.2 is still an experimental Paper target. Test every BasicX update on a staging server and back up `plugins/BasicX` before upgrading production data.
+
+## Building
+
+The Gradle wrapper provisions the compile toolchain automatically:
+
+```shell
+./gradlew build
+```
+
+On Windows:
+
+```powershell
+.\gradlew.bat build
+```
+
+The plugin JAR is written to `build/libs`. Runtime libraries are resolved from the public ModLabs and Maven Central repositories by Paper's isolated plugin library loader.
+
+## Modules and commands
+
+Modules can be toggled in `plugins/BasicX/config.yml` or with `/basicx module enable|disable <module>`. Changes apply at runtime.
+
+- Teleportation: `/tp`, `/tpa`, `/tpaccept`, `/tpdeny`
+- Homes and warps: `/homes`, `/home`, `/warp`, `/createwarp`, `/deletewarp`
+- Player tools: `/kit`, `/trash`, `/feed`, `/heal`, `/fly`, `/anvil`
+- Administration: `/invsee`, `/gm`, `/vanish`, `/itemedit`, `/time`, `/weather`
+- Management: `/basicx`, `/basicx reload`, `/basicx module ...`
+
+The former economy command was removed because it did not persist balances or perform transfers.
+
+## Permissions
+
+Permissions and their safe defaults are declared in `paper-plugin.yml`. Player-facing defaults include `basicx.tpa`, `basicx.homes`, `basicx.warp`, `basicx.kit`, `basicx.kit.starter`, and `basicx.trash`; administrative permissions default to operators.
+
+## Verification
+
+Automated checks run through `./gradlew build`. For release validation, follow [the Paper 26.2 smoke test](docs/SMOKE_TEST.md).
+
+## License
+
+BasicX is available under the [MIT License](LICENSE).

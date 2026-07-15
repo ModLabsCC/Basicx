@@ -1,11 +1,16 @@
 package cc.modlabs.basicx.cache
 
+import cc.modlabs.basicx.BasicX
+import cc.modlabs.basicx.managers.ConfigWriter
 import cc.modlabs.basicx.managers.FileConfig
-import cc.modlabs.kpaper.extensions.getLogger
+import cc.modlabs.basicx.util.isSafeIdentifier
+import org.bukkit.Material
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.withLock
 
 object KitCache {
 
@@ -13,84 +18,85 @@ object KitCache {
     private var cache: MutableMap<String, List<ItemStack>> = mutableMapOf()
     private val cooldowns: MutableMap<UUID, MutableMap<String, Long>> = mutableMapOf()
 
-    fun getKit(name: String): List<ItemStack>? {
-        cacheLock.readLock().lock()
-        val kit = cache[name]
-        cacheLock.readLock().unlock()
-        return kit
-    }
+    fun getKit(name: String): List<ItemStack>? =
+        cacheLock.readLock().withLock { cache[name]?.map(ItemStack::clone) }
 
-    fun getKits(): List<String> {
-        cacheLock.readLock().lock()
-        val kits = cache.keys.toList()
-        cacheLock.readLock().unlock()
-        return kits
-    }
+    fun getKits(): List<String> =
+        cacheLock.readLock().withLock { cache.keys.sorted() }
 
     fun addKit(name: String, items: List<ItemStack>) {
-        cacheLock.writeLock().lock()
-        cache[name] = items
-        saveCache()
-        cacheLock.writeLock().unlock()
+        require(isSafeIdentifier(name)) { "Invalid kit name: $name" }
+        val snapshot = cacheLock.writeLock().withLock {
+            cache[name] = items.map(ItemStack::clone)
+            snapshot()
+        }
+        saveCache(snapshot)
     }
 
     fun removeKit(name: String) {
-        cacheLock.writeLock().lock()
-        cache.remove(name)
-        saveCache()
-        cacheLock.writeLock().unlock()
+        val snapshot = cacheLock.writeLock().withLock {
+            cache.remove(name)
+            snapshot()
+        }
+        saveCache(snapshot)
     }
 
     fun loadCache() {
-        cacheLock.writeLock().lock()
-        cache = mutableMapOf()
-
-        val kitsFile = FileConfig("kits.yml")
+        ConfigWriter.flush(FILE_NAME)
+        val kitsFile = FileConfig(FILE_NAME)
         val kitNames = kitsFile.getKeys(false)
+        val loaded = mutableMapOf<String, List<ItemStack>>()
 
         for (kitName in kitNames) {
+            if (!isSafeIdentifier(kitName)) continue
             val items = mutableListOf<ItemStack>()
 
             val itemPaths = kitsFile.getConfigurationSection(kitName)?.getKeys(false) ?: continue
 
             for (itemPath in itemPaths) {
-                val item = kitsFile.getItemStack("$kitName.$itemPath")
+                val path = "$kitName.$itemPath"
+                val item = kitsFile.getItemStack(path) ?: run {
+                    val materialName = kitsFile.getString("$path.type") ?: return@run null
+                    val material = Material.matchMaterial(materialName) ?: return@run null
+                    ItemStack(material, kitsFile.getInt("$path.amount", 1).coerceAtLeast(1))
+                }
                 if (item != null) {
-                    items.add(item)
+                    items.add(item.clone())
                 }
             }
 
-            cache[kitName] = items
+            loaded[kitName] = items
         }
 
-        getLogger().info("Loaded ${cache.size} kits")
-        cacheLock.writeLock().unlock()
+        cacheLock.writeLock().withLock { cache = loaded }
+        BasicX.instance.logger.info("Loaded ${loaded.size} kits")
     }
 
-    private fun saveCache() {
-        val kitsFile = FileConfig("kits.yml")
+    private fun snapshot(): Map<String, List<ItemStack>> =
+        cache.mapValues { (_, items) -> items.map(ItemStack::clone) }
 
-        cache.forEach { (kitName, items) ->
+    private fun saveCache(snapshot: Map<String, List<ItemStack>>) {
+        val configuration = YamlConfiguration()
+        snapshot.forEach { (kitName, items) ->
             items.forEachIndexed { index, itemStack ->
-                kitsFile["$kitName.$index"] = itemStack
+                configuration["$kitName.$index"] = itemStack
             }
         }
-
-        kitsFile.saveConfig()
+        ConfigWriter.schedule(FILE_NAME, configuration.saveToString())
     }
 
-    fun getCooldown(playerUUID: UUID, kitName: String): Long {
-        cacheLock.readLock().lock()
-        val playerCooldowns = cooldowns[playerUUID]
-        val cooldown = playerCooldowns?.get(kitName) ?: 0L
-        cacheLock.readLock().unlock()
-        return cooldown
-    }
+    fun getCooldown(playerUUID: UUID, kitName: String): Long =
+        cacheLock.readLock().withLock { cooldowns[playerUUID]?.get(kitName) ?: 0L }
 
     fun setCooldown(playerUUID: UUID, kitName: String, cooldownEnd: Long) {
-        cacheLock.writeLock().lock()
-        val playerCooldowns = cooldowns.getOrPut(playerUUID) { mutableMapOf() }
-        playerCooldowns[kitName] = cooldownEnd
-        cacheLock.writeLock().unlock()
+        cacheLock.writeLock().withLock {
+            cooldowns.getOrPut(playerUUID) { mutableMapOf() }[kitName] = cooldownEnd
+        }
+    }
+
+    private const val FILE_NAME = "kits.yml"
+
+    fun flush() {
+        ConfigWriter.flush(FILE_NAME)
     }
 }

@@ -1,6 +1,8 @@
 package cc.modlabs.basicx.commands
 
 import cc.modlabs.basicx.extensions.send
+import cc.modlabs.basicx.modules.BasicXModule
+import cc.modlabs.basicx.util.canUseModule
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -23,7 +25,7 @@ class HealCommand : Command<CommandSourceStack> {
             return Command.SINGLE_SUCCESS
         }
 
-        target.health = target.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
+        target.health = target.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
         target.send("commands.heal.success", default = "You have been healed.")
         sender.send("commands.heal.sender-success", mapOf("target" to targetName), default = "You have healed {target}.")
 
@@ -33,7 +35,7 @@ class HealCommand : Command<CommandSourceStack> {
     companion object {
         fun createHealCommand(): LiteralCommandNode<CommandSourceStack> {
             return Commands.literal("heal")
-                .requires { it.sender.hasPermission("basicx.heal") }
+                .requires { it.canUseModule(BasicXModule.HEAL, "basicx.heal") }
                 .executes { context ->
                     val sender = context.source.sender
                     if (sender !is Player) {
@@ -41,11 +43,12 @@ class HealCommand : Command<CommandSourceStack> {
                         return@executes Command.SINGLE_SUCCESS
                     }
 
-                    sender.health = sender.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
+                    sender.health = sender.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
                     sender.send("commands.heal.success", default = "You have been healed.")
                     Command.SINGLE_SUCCESS
                 }
                 .then(Commands.argument("target", StringArgumentType.string())
+                    .requires { it.sender.hasPermission("basicx.heal.others") }
                     .executes(HealCommand())
                 )
                 .build()
