@@ -11,23 +11,25 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '15'))
     }
 
-    // Push auf main: Multibranch-Pipeline mit Git-Webhook einrichten (z. B. GitHub Branch Source).
-    // Nur der main-Branch führt den Build aus; andere Branches werden übersprungen.
-    when {
-        branch 'main'
-    }
-
+    // Nur der main-Branch baut; andere Branches werden von Jenkins übersprungen (Stage skipped).
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
+        stage('main') {
+            when {
+                branch 'main'
             }
-        }
+            stages {
+                stage('Checkout') {
+                    steps {
+                        checkout scm
+                    }
+                }
 
-        stage('Build') {
-            steps {
-                sh 'chmod +x gradlew'
-                sh './gradlew build --warning-mode all --stacktrace'
+                stage('Build') {
+                    steps {
+                        sh 'chmod +x gradlew'
+                        sh './gradlew build --warning-mode all --stacktrace'
+                    }
+                }
             }
         }
     }
