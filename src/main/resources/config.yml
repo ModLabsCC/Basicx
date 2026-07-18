@@ -23,10 +23,10 @@ modules:
     enabled: true     # Enable/Disable trash GUI
 
   time:
-    enabled: true     # Enable/Disable time commands
+    enabled: true     # BasicX /time; set false + restart to keep vanilla /time
 
   weather:
-    enabled: true     # Enable/Disable weather commands
+    enabled: true     # BasicX /weather; set false + restart to keep vanilla /weather
 
   fly:
     enabled: true     # Enable/Disable fly mode commands
@@ -35,7 +35,7 @@ modules:
     enabled: true     # Enable/Disable warp system
 
   teleport:
-    enabled: true     # Enable/Disable admin teleport system
+    enabled: true     # BasicX /tp; set false + restart to keep vanilla /tp
 
   teleport-requests:
     enabled: true     # Enable/Disable teleport request system

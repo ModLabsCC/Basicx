@@ -5,6 +5,7 @@ import cc.modlabs.basicx.commands.FeedCommand.Companion.createFeedCommand
 import cc.modlabs.basicx.commands.HealCommand.Companion.createHealCommand
 import cc.modlabs.basicx.commands.KitCommand.Companion.createKitCommand
 import cc.modlabs.basicx.managers.FileConfig
+import cc.modlabs.basicx.managers.ModuleManager
 import cc.modlabs.basicx.modules.BasicXModule
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
@@ -39,8 +40,12 @@ class CommandBootstrapper : PluginBootstrap {
         manager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             val commands = event.registrar()
 
-            for (register in moduleFunctions.values) {
-                register(commands)
+            // Only register enabled modules. Registering `/tp`, `/time`, or `/weather`
+            // always overrides the vanilla command of the same name.
+            for ((module, register) in moduleFunctions) {
+                if (ModuleManager.isModuleEnabled(module)) {
+                    register(commands)
+                }
             }
 
             registerPluginManagementCommands(commands)
